@@ -13,7 +13,15 @@ public class ParticulesHandler {
 		this.list = new LinkedList<Sphere>();
 	}
 
-	public void addtolist(Sphere p) {
+	public double random(double x, double y)
+	{
+		return (Math.random() * (y-x)) + x;
+	}
+	
+	public void addtolist(int x, int y, int WIDTH, int HEIGHT, Image texture) {
+
+		double s = random(0.5f,1f);
+		Sphere p = new Sphere(x, y, WIDTH, HEIGHT, random(0.2f,0.9f), (float)s, texture);
 		this.list.addLast(p);
 	}
 

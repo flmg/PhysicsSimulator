@@ -15,7 +15,7 @@ public class Sphere {
 	float scale;
 	Image texture;
 
-	public Sphere(double x, double y, int s, double m, int w, int h, double rest, float sc, Image t) {
+	public Sphere(double x, double y, int w, int h, double rest, float sc, Image t) {
 		this.WIDTH = w;
 		this.HEIGHT = h;
 		this.scale = sc;
@@ -35,7 +35,7 @@ public class Sphere {
 		else 
 			this.posY = y;
 
-		this.mass = m;
+		this.mass = sc * 100;
 		this.texture = t;
 		this.velX = 0;
 		this.velY = 0;
@@ -65,6 +65,7 @@ public class Sphere {
 
 		if ((posY + size * 2 + Math.pow(10,-9) >= HEIGHT) && (velY > 0)) {
 			reflectionV(0, -1);
+			posY = Math.min(posY, HEIGHT - size * 2);
 		}
 
 		if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX > 0)) {
