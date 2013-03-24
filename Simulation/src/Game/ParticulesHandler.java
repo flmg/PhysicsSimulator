@@ -2,18 +2,18 @@ package Game;
 
 import java.util.LinkedList;
 
-import Game.Particule;
+import Game.Sphere;
 import org.newdawn.slick.*;
 
 public class ParticulesHandler {
 
-	private LinkedList<Particule> list;
+	private LinkedList<Sphere> list;
 
 	public ParticulesHandler() {
-		this.list = new LinkedList<Particule>();
+		this.list = new LinkedList<Sphere>();
 	}
 
-	public void addtolist(Particule p) {
+	public void addtolist(Sphere p) {
 		this.list.addLast(p);
 	}
 
@@ -22,13 +22,9 @@ public class ParticulesHandler {
 			list.get(i).render(gc, g);
 	}
 
-	public void update(GameContainer gc) throws SlickException {
-		for (int i = 0; i < list.size(); i++)
-			if (list.get(i).life >= 0) {
-				list.get(i).update(gc);
-			} else {
-				list.remove(i);
-				i--;
-			}
+	public void update(GameContainer gc, float dt) throws SlickException {
+		for (int i = 0; i < list.size(); i++) {
+			list.get(i).update(gc, dt);
+		}
+		}
 	}
-}
