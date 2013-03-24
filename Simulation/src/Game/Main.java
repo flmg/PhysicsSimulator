@@ -13,7 +13,12 @@ public class Main extends BasicGame {
 	public Main() {
 		super("Physics Simulation");
 	}
-
+	
+	public double random(double x, double y)
+	{
+		return (Math.random() * (y-x)) + x;
+	}
+	
 	@Override
 	public void init(GameContainer gc) throws SlickException {
 		try {
@@ -27,12 +32,13 @@ public class Main extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		rand = (int) (Math.random() * 100 + 1);
 		Input ip = gc.getInput();
-		particules.update(gc, (float)delta / 1000f);
+		particules.update(gc, (double)delta / 1000f);
 
 		// Mouse left clicked
 		if (ip.isMouseButtonDown(0) && !old_MouseButtonDown) {
+			double s = random(0.5f,1f);
 			Sphere p = new Sphere(ip.getMouseX(), ip.getMouseY(), 30,
-					rand, texture, 1024, 720, (float)Math.random());
+					rand, 1024, 720, s, (float)s, texture);
 			particules.addtolist(p);
 		}
 		old_MouseButtonDown = ip.isMouseButtonDown(0);

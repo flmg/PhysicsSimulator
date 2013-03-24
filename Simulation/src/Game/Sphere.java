@@ -4,34 +4,50 @@ import org.newdawn.slick.*;
 
 public class Sphere {
 
-	int size;
+	double size;
 	int HEIGHT, WIDTH;
-	float mass;
-	float posX;
-	float posY;
-	float velX;
-	float velY;
-	float e;
+	double mass;
+	double posX;
+	double posY;
+	double velX;
+	double velY;
+	double e;
+	float scale;
 	Image texture;
 
-	public Sphere(float x, float y, int s, float m, Image t, int w, int h, float rest) {
-		this.posX = x;
-		this.posY = y;
-		this.size = s / 2;
+	public Sphere(double x, double y, int s, double m, int w, int h, double rest, float sc, Image t) {
+		this.WIDTH = w;
+		this.HEIGHT = h;
+		this.scale = sc;
+		this.size = (96 * scale) / 2;
+		
+		if (x <= 0)
+			this.posX = 0;
+		else if (x >= WIDTH - (size * 2))
+			this.posX = WIDTH - (size * 2);
+		else 
+			this.posX = x;
+
+		if (y <= 0)
+			this.posY = 0;
+		else if (y >= HEIGHT - (size * 2))
+			this.posY = HEIGHT - (size * 2);
+		else 
+			this.posY = y;
+
 		this.mass = m;
 		this.texture = t;
 		this.velX = 0;
 		this.velY = 0;
-		this.WIDTH = w;
-		this.HEIGHT = h;
 		this.e = rest;
+		this.scale = sc;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		this.texture.draw(posX, posY);
+		this.texture.draw((int)posX, (int)posY, scale);
 	}
 
-	public void update(GameContainer gc, float dt) throws SlickException {
+	public void update(GameContainer gc, double dt) throws SlickException {
 
 		// Gravity
 		velY += 9.8 * dt * 100;
@@ -40,8 +56,8 @@ public class Sphere {
 		distPlane(dt);
 	}
 
-	//Collision between objects and limits handler
-	private void distPlane(float dt)
+	//Collision between objects and edges
+	private void distPlane(double dt)
 	{
 		if (posX - Math.pow(10,-9) <= 0 && (velX < 0)) {
 			reflectionV(1, 0);
@@ -63,8 +79,9 @@ public class Sphere {
 		posY += velY * dt;
 
 	}
-
-	void reflectionV(int a, int b)
+	
+	// Calculates the reflection vector
+	private void reflectionV(int a, int b)
 	{
 		double x = ((1+e)*(a*(velX * a + velY * b))) / (1 / mass);
 		double y = ((1+e)*(b*(velX * a + velY * b))) / (1 / mass);
@@ -72,5 +89,4 @@ public class Sphere {
 		velX -= x * (1 / mass);
 		velY -= y * (1 / mass);
 	}
-
 }
