@@ -11,8 +11,10 @@ public class Main extends BasicGame {
 	private Image texture;
 	private ParticulesHandler particules = new ParticulesHandler();
 	private Fluid water;
+	private Sand sand;
 	private boolean old_MouseButtonDown;
 	private double bt;
+	private String particuleType;
 
 	public Main() {
 		super("Physics Simulation");
@@ -26,7 +28,10 @@ public class Main extends BasicGame {
 			e.printStackTrace();
 		}
 
+		this.particuleType = "water";
 		this.water = new Fluid(gc, Color.blue, 4);
+		this.sand = new Sand(gc, Color.yellow, 4);
+
 		bt = 1.0f;
 	}
 
@@ -35,6 +40,7 @@ public class Main extends BasicGame {
 		Input ip = gc.getInput();
 		particules.update(gc, bt * (double) delta / 1000f);
 		water.update(gc, delta);
+		sand.update(gc, delta);
 
 		// Mouse left clicked
 		if (ip.isMouseButtonDown(0) && !old_MouseButtonDown) {
@@ -43,9 +49,21 @@ public class Main extends BasicGame {
 		}
 		// Mouse right clicked (add sand)
 		if (ip.isMouseButtonDown(1)) {
-			water.add(ip.getMouseX() / water.scale, ip.getMouseY()
-					/ water.scale);
+			if (particuleType == "sand")
+				sand.add(ip.getMouseX() / sand.scale, ip.getMouseY()
+						/ sand.scale);
+			else
+				water.add(ip.getMouseX() / water.scale, ip.getMouseY()
+						/ water.scale);
 		}
+		// mode selection
+		if (ip.isKeyPressed(Input.KEY_M)) {
+			if (particuleType == "water")
+				particuleType = "sand";
+			else
+				particuleType = "water";
+		}
+
 		if (ip.isKeyPressed(Input.KEY_UP)) {
 			if (bt < 2)
 				bt += 0.1f;
@@ -65,7 +83,11 @@ public class Main extends BasicGame {
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		particules.render(gc, g);
 		water.render(gc, g);
+		sand.render(gc, g);
+		g.setColor(Color.white);
 		g.drawString(String.format("Speed : %.2f", bt), 10, 35);
+		g.drawString("Particule Type : " + particuleType
+				+ " (Press M to switch)", 10, 60);
 	}
 
 	public static void main(String[] args) throws SlickException {

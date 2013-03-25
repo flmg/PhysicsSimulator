@@ -6,9 +6,9 @@ import org.newdawn.slick.*;
 
 public class Fluid {
 
-	private int[][] map;
-	private int w, h;
-	private Color c;
+	public int[][] map;
+	public int w, h;
+	public Color c;
 	public int scale;
 
 	public Fluid(GameContainer gc, Color col, int s) {
@@ -65,6 +65,24 @@ public class Fluid {
 		return false;
 	}
 
+	public boolean add_down_right(int i, int j) {
+		if (i + 1 < w && j + 1 < h && map[i + 1][j + 1] == 0) {
+			add(i + 1, j + 1);
+			free(i, j);
+			return true;
+		}
+		return false;
+	}
+
+	public boolean add_down_left(int i, int j) {
+		if (i - 1 >= 0 && j + 1 < h && map[i - 1][j + 1] == 0) {
+			add(i - 1, j + 1);
+			free(i, j);
+			return true;
+		}
+		return false;
+	}
+
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
@@ -78,7 +96,7 @@ public class Fluid {
 	}
 
 	public void update(GameContainer gc, double dt) throws SlickException {
-		for (int j = h - 2; j >= 0; j--) {
+		for (int j = h - 1; j >= 0; j--) {
 			for (int i = 0; i < w; i++) {
 				// if there is fluid
 				if (map[i][j] == 1) {
