@@ -3,22 +3,15 @@ package Game;
 // import java.awt.event.KeyEvent; // Unused 
 
 import Game.ParticulesHandler;
-import Game.Fluid;
+import Game.FluidsHandler;
 import org.newdawn.slick.*;
 
 public class Main extends BasicGame {
 
 	private Image texture;
 	private ParticulesHandler particules = new ParticulesHandler();
-	private Fluid water;
-	private Sand sand;
 	private double bt;
-	public enum type 
-	{
-		Water,
-		Sand
-	};
-	private type particuleType;
+	private FluidsHandler fluids;
 
 	public Main() {
 		super("Physics Simulation");
@@ -31,11 +24,7 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-
-		this.particuleType = type.Water;
-		this.water = new Fluid(gc, Color.blue, 4);
-		this.sand = new Sand(gc, Color.yellow, 4);
-
+		this.fluids = new FluidsHandler(gc, 4);
 		bt = 1.0f;
 	}
 
@@ -43,8 +32,7 @@ public class Main extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input ip = gc.getInput();
 		particules.update(gc, bt * (double) delta / 1000f);
-		water.update(gc, delta);
-		sand.update(gc, delta);
+		fluids.update(gc, delta);
 
 		// Mouse left clicked
 		if (ip.isMouseButtonDown(0)) {
@@ -53,19 +41,11 @@ public class Main extends BasicGame {
 		}
 		// Mouse right clicked (add sand)
 		if (ip.isMouseButtonDown(1)) {
-			if (particuleType == type.Sand)
-				sand.add(ip.getMouseX() / sand.scale, ip.getMouseY()
-						/ sand.scale);
-			else
-				water.add(ip.getMouseX() / water.scale, ip.getMouseY()
-						/ water.scale);
+			fluids.addParticule(ip.getMouseX()/fluids.scale, ip.getMouseY()/fluids.scale);
 		}
 		// mode selection
 		if (ip.isKeyPressed(Input.KEY_M)) {
-			if (particuleType == type.Water)
-				particuleType = type.Sand;
-			else
-				particuleType = type.Water;
+			fluids.changeParticules();
 		}
 
 		if (ip.isKeyPressed(Input.KEY_UP)) {
@@ -80,24 +60,24 @@ public class Main extends BasicGame {
 			else
 				bt = 1.0f;
 		}
-		
+
 		if (ip.isKeyPressed(Input.KEY_TAB)) {
 			bt = 1.0f;
 			particules.reset();
-			water.init();
-			sand.init();
+			fluids.clear();
 		}
 	}
 
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		particules.render(gc, g);
-		water.render(gc, g);
-		sand.render(gc, g);
+		fluids.render(gc, g);
 		g.setColor(Color.white);
-		g.drawString(String.format("%d balls (TAB to reset session)", particules.count()), 10, 35);
+		g.drawString(
+				String.format("%d balls (TAB to reset session)",
+						particules.count()), 10, 35);
 		g.drawString(String.format("Speed : %.2f", bt), 10, 60);
-		g.drawString("Particule Type : " + particuleType
+		g.drawString("Particule Type : " + fluids.particuleType.toString()
 				+ " (Press M to switch)", 10, 85);
 	}
 
