@@ -17,13 +17,18 @@ public class Fluid {
 		h = gc.getHeight() / scale;
 		this.c = col;
 		map = new int[w][h];
+		init();
+	}
+	
+	public void init()
+	{
 		for (int j = 0; j < h; j++) {
 			for (int i = 0; i < w; i++) {
 				map[i][j] = 0;
 			}
 		}
 	}
-
+	
 	public boolean getRandomBoolean() {
 		Random random = new Random();
 		return random.nextBoolean();

@@ -4,16 +4,16 @@ import org.newdawn.slick.*;
 
 public class Sphere {
 
-	double size;
-	int HEIGHT, WIDTH;
+	public double size;
+	private int HEIGHT, WIDTH;
 	double mass;
 	double posX;
 	double posY;
 	double velX;
 	double velY;
 	double e;
-	float scale;
-	Image texture;
+	private float scale;
+	private Image texture;
 
 	public Sphere(double x, double y, int w, int h, double rest, float sc, Image t) {
 		this.WIDTH = w;
