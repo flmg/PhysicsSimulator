@@ -9,11 +9,14 @@ public class Sphere {
 	double mass;
 	double posX;
 	double posY;
+	double old_posX;
+	double old_posY;
 	double velX;
 	double velY;
 	double e;
 	private float scale;
 	private Image texture;
+	public boolean selected;
 
 	public Sphere(double x, double y, int w, int h, double rest, float sc, Image t) {
 		this.WIDTH = w;
@@ -35,25 +38,39 @@ public class Sphere {
 		else 
 			this.posY = y;
 
+		old_posX = posX;
+		old_posY = posY;
+		
 		this.mass = sc * 100;
 		this.texture = t;
 		this.velX = 0;
 		this.velY = 0;
 		this.e = rest;
 		this.scale = sc;
+		this.selected = false;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		this.texture.draw((int)posX, (int)posY, scale);
 	}
 
-	public void update(GameContainer gc, double dt) throws SlickException {
+	public void update(double dt) throws SlickException {
 				
 		// Gravity
 		velY += 9.8 * dt * 100;
 
 		// Movements
 		distPlane(dt);
+	}
+	public void update(double x, double y, double dt) throws SlickException {
+		posX = x - size;
+		posY = y - size;
+		
+		velX = (posX - old_posX) / (dt * mass * 0.35f);
+		velY = (posY - old_posY) / (dt * mass * 0.35f);
+		
+		old_posX = posX;
+		old_posY = posY;
 	}
 
 	//Collision between objects and edges

@@ -42,13 +42,13 @@ public class Main extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input ip = gc.getInput();
-		particules.update(gc, bt * (double) delta / 1000f);
-		water.update(gc, delta);
-		sand.update(gc, delta);
+		particules.update(bt * (double) delta / 1000f, ip.getMouseX(), ip.getMouseY());
+		water.update(delta);
+		sand.update(delta);
 
 		// Mouse left clicked
-		if (ip.isMouseButtonDown(0)) {
-			particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
+		if (ip.isMousePressed(0)) {
+				particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
 					texture);
 		}
 		// Mouse right clicked (add sand)

@@ -13,7 +13,7 @@ public class Sand extends Fluid {
 	}
 
 	@Override
-	public void update(GameContainer gc, double dt) throws SlickException {
+	public void update(double dt) throws SlickException {
 		for (int j = h - 1; j >= 0; j--) {
 			for (int i = 0; i < w; i++) {
 				// if there is fluid
