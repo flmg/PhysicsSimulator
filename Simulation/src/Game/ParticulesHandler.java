@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import Game.Sphere;
 import org.newdawn.slick.*;
 
-public class ParticulesHandler {
-
+public class ParticulesHandler 
+{	
 	private LinkedList<Sphere> list;
 
 	public ParticulesHandler() {
@@ -18,16 +18,6 @@ public class ParticulesHandler {
 		return (Math.random() * (y-x)) + x;
 	}
 
-	public void addtolist(int x, int y, int WIDTH, int HEIGHT, Image texture) {
-
-		double s = random(0.5f,1f);
-		Sphere p = new Sphere(x, y, WIDTH, HEIGHT, random(0.2f,0.9f), (float)s, texture);
-		this.list.addLast(p);
-	}
-	public void reset()
-	{
-		this.list.clear();
-	}
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		for (int i = 0; i < list.size(); i++)
 			list.get(i).render(gc, g);
@@ -37,7 +27,7 @@ public class ParticulesHandler {
 		for (int i = 0; i < list.size(); i++) {
 			// We check for collisions for all other spheres
 			for (int j = i + 1; j < list.size(); j++)
-				collision(list.get(i),list.get(j),dt);
+				collision(list.get(i),list.get(j));
 
 			list.get(i).update(gc, dt);
 		}
@@ -55,17 +45,25 @@ public class ParticulesHandler {
 		double dX = Math.pow(((B.posX + B.size) - (A.posX + A.size)), 2);
 		double dY = Math.pow(((B.posY + B.size) - (A.posY + A.size)), 2);
 		// We don't root square because it's a very slow operation 
-		// We'd rather square the other side
+		// We'd rather square the other side of the (in)equation
+		return (dX + dY);
+	}
+	private double distance(Sphere A, double x, double y, double size)
+	{
+		double dX = Math.pow(((x + size) - (A.posX + A.size)), 2);
+		double dY = Math.pow(((y + size) - (A.posY + A.size)), 2);
+		// We don't root square because it's a very slow operation 
+		// We'd rather square the other side of the (in)equation
 		return (dX + dY);
 	}
 
 	// Collision between spheres
-	void collision(Sphere A, Sphere B, double dt)
+	private void collision(Sphere A, Sphere B)
 	{
 		// if balls are moving toward each other and they are close 
 		// the 10^-9 is here to compensate the eventual rounding error
-		if (movingToBall(A, B) && distance(A,B) <= Math.pow(A.size + B.size, 2) + Math.pow(10,-9))
-		{
+		if (movingToBall(A, B) && distance(A,B) <= Math.pow(A.size + B.size + Math.pow(10,-9), 2))
+		{ 
 			// Calculation of the resulting impulse for each ball
 			double nx = (A.posX - B.posX) / (A.size + B.size); // Normalized vector in X
 			double ny = (A.posY - B.posY) / (A.size + B.size); // Normalized vector in Y
@@ -74,7 +72,7 @@ public class ParticulesHandler {
 			double p = (a1 - a2) / (A.mass + B.mass); // Resultant impulse
 			//===================================================
 
-			// Re-positionning if the collision has gone too far
+			// Repositioning if the collision has gone too far
 			// And if balls are overlapping
 			double angle = Math.atan2(B.posY - A.posY,B.posX - A.posX);
 			double tomove = B.size + A.size - Math.sqrt(distance(A, B));
@@ -93,7 +91,57 @@ public class ParticulesHandler {
 		}
 	}
 
+	// Calculates the smallest time before a collision occurs collision 
+	private double[] timeToCollision() 
+	{
+		double[] res= { 9999, -1, -1 };
+		double A, B, C, D, DISC; 
+
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+
+				if (movingToBall(list.get(i), list.get(j))) 
+				{
+					// Breaking down the very long formula for t  
+					A = Math.pow(list.get(i).velX, 2) + Math.pow(list.get(i).velY, 2) - 2 * list.get(i).velX * list.get(j).velX + Math.pow(list.get(j).velX, 2) - 2 * list.get(i).velY * list.get(j).velY + Math.pow(list.get(j).velY, 2); 
+					B = -list.get(i).posX * list.get(i).velX - list.get(i).posY * list.get(i).velY + list.get(i).velX * list.get(j).posX + list.get(i).velY * list.get(j).posY + list.get(i).posX * list.get(j).velX - list.get(j).posX * list.get(j).velX + list.get(i).posY * list.get(j).velY - list.get(j).posY * list.get(j).velY; 
+					C = Math.pow(list.get(i).velX, 2) + Math.pow(list.get(i).velY, 2) - 2 * list.get(i).velX * list.get(j).velX + Math.pow(list.get(j).velX, 2) - 2 * list.get(i).velY * list.get(j).velY + Math.pow(list.get(j).velY, 2);
+					D = Math.pow(list.get(i).posX, 2) + Math.pow(list.get(i).posY, 2) - Math.pow(list.get(i).size, 2) - 2 * list.get(i).posX * list.get(j).posX + Math.pow(list.get(j).posX, 2) - 2 * list.get(i).posY * list.get(j).posY + Math.pow(list.get(j).posY, 2) - 2 * list.get(i).size * list.get(j).size - Math.pow(list.get(j).size, 2); 
+					DISC = Math.pow((-2 * B), 2) - 4 * C * D;
+
+					 
+					if (DISC >= 0) {
+						// We want the smallest time
+						res[0] = Math.min(Math.min(res[0], 0.5 * (2 * B - Math.sqrt(DISC)) / A), 0.5 * (2 * B + Math.sqrt(DISC)) / A); 
+					}
+				}
+			}
+
+		}
+		return res;
+	} 
+
+
+	// Basic public operation on list
 	public int count() {
 		return list.size(); 
 	}
+
+	public void addtolist(int x, int y, int WIDTH, int HEIGHT, Image texture) {
+		double s = random(0.5f,1f);
+		double size = (96 * s) / 2;
+		// Prevents from creating a sphere if it overlaps another one
+		for (int i = 0; i < list.size(); i++) {
+			if (distance(list.get(i), x, y, size) <= Math.pow(list.get(i).size + size + Math.pow(10,-9), 2))
+				return;
+		}
+		Sphere p = new Sphere(x, y, WIDTH, HEIGHT, random(0.2f,0.9f), (float)s, texture);
+		this.list.addLast(p);
+	}
+
+	public void reset() {
+		this.list.clear();
+	}
+	// ==============================
+
 }

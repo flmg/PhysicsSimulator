@@ -48,7 +48,7 @@ public class Sphere {
 	}
 
 	public void update(GameContainer gc, double dt) throws SlickException {
-
+				
 		// Gravity
 		velY += 9.8 * dt * 100;
 
@@ -59,23 +59,28 @@ public class Sphere {
 	//Collision between objects and edges
 	private void distPlane(double dt)
 	{
+		// Left edge
 		if (posX - Math.pow(10,-9) <= 0 && (velX < 0)) {
 			reflectionV(1, 0);
+			posX = Math.min(posX, WIDTH - size * 2); // Repositioning
+		}
+		// Right edge
+		else if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX > 0)) {
+			reflectionV(-1, 0);
+			posX = Math.max(posX, 0); // Repositioning
 		}
 
+		// Bottom edge
 		if ((posY + size * 2 + Math.pow(10,-9) >= HEIGHT) && (velY > 0)) {
 			reflectionV(0, -1);
-			posY = Math.min(posY, HEIGHT - size * 2);
+			posY = Math.min(posY, HEIGHT - size * 2); // Repositioning
 		}
-
-		if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX > 0)) {
-			reflectionV(-1, 0);
-		}
-
-		if (posY - Math.pow(10,-9)  <= 0 && (velY < 0)) {
+		// Top edge
+		else if (posY - Math.pow(10,-9)  <= 0 && (velY < 0)) {
 			reflectionV(0, 1);
+			posY = Math.max(posY, 0); // Repositioning
 		}
-
+		
 		posX += velX * dt;
 		posY += velY * dt;
 

@@ -12,7 +12,6 @@ public class Main extends BasicGame {
 	private ParticulesHandler particules = new ParticulesHandler();
 	private Fluid water;
 	private Sand sand;
-	private boolean old_MouseButtonDown;
 	private double bt;
 	public enum type 
 	{
@@ -48,7 +47,7 @@ public class Main extends BasicGame {
 		sand.update(gc, delta);
 
 		// Mouse left clicked
-		if (ip.isMouseButtonDown(0) && !old_MouseButtonDown) {
+		if (ip.isMouseButtonDown(0)) {
 			particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
 					texture);
 		}
@@ -88,7 +87,6 @@ public class Main extends BasicGame {
 			water.init();
 			sand.init();
 		}
-		old_MouseButtonDown = ip.isMouseButtonDown(0);
 	}
 
 	@Override
