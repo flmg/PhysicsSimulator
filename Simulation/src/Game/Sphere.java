@@ -9,11 +9,14 @@ public class Sphere {
 	double mass;
 	double posX;
 	double posY;
+	double old_posX;
+	double old_posY;
 	double velX;
 	double velY;
 	double e;
 	private float scale;
 	private Image texture;
+	public boolean selected;
 
 	public Sphere(double x, double y, int w, int h, double rest, float sc, Image t) {
 		this.WIDTH = w;
@@ -35,19 +38,23 @@ public class Sphere {
 		else 
 			this.posY = y;
 
+		old_posX = posX;
+		old_posY = posY;
+		
 		this.mass = sc * 100;
 		this.texture = t;
 		this.velX = 0;
 		this.velY = 0;
 		this.e = rest;
 		this.scale = sc;
+		this.selected = false;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		this.texture.draw((int)posX, (int)posY, scale);
 	}
 
-	public void update(GameContainer gc, double dt) throws SlickException {
+	public void update(double dt) throws SlickException {
 				
 		// Gravity
 		velY += 9.8 * dt * 100;
@@ -55,28 +62,38 @@ public class Sphere {
 		// Movements
 		distPlane(dt);
 	}
+	public void update(double x, double y, double dt) throws SlickException {
+		posX = x - size;
+		posY = y - size;
+		
+		velX = (posX - old_posX) / (dt * mass * 0.35f);
+		velY = (posY - old_posY) / (dt * mass * 0.35f);
+		
+		old_posX = posX;
+		old_posY = posY;
+	}
 
 	//Collision between objects and edges
 	private void distPlane(double dt)
 	{
 		// Left edge
-		if (posX - Math.pow(10,-9) <= 0 && (velX < 0)) {
+		if (posX - Math.pow(10,-9) <= 0 && (velX <= 0)) {
 			reflectionV(1, 0);
-			posX = Math.min(posX, WIDTH - size * 2); // Repositioning
+			posX = Math.max(posX, 0); // Repositioning
 		}
 		// Right edge
-		else if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX > 0)) {
+		else if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX >= 0)) {
 			reflectionV(-1, 0);
-			posX = Math.max(posX, 0); // Repositioning
+			posX = Math.min(posX, WIDTH - size * 2); // Repositioning
 		}
 
 		// Bottom edge
-		if ((posY + size * 2 + Math.pow(10,-9) >= HEIGHT) && (velY > 0)) {
+		if ((posY + size * 2 + Math.pow(10,-9) >= HEIGHT) && (velY >= 0)) {
 			reflectionV(0, -1);
 			posY = Math.min(posY, HEIGHT - size * 2); // Repositioning
 		}
 		// Top edge
-		else if (posY - Math.pow(10,-9)  <= 0 && (velY < 0)) {
+		else if (posY - Math.pow(10,-9)  <= 0 && (velY <= 0)) {
 			reflectionV(0, 1);
 			posY = Math.max(posY, 0); // Repositioning
 		}

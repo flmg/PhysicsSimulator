@@ -8,9 +8,11 @@ import org.newdawn.slick.*;
 public class ParticulesHandler 
 {	
 	private LinkedList<Sphere> list;
+	private int selected;
 
 	public ParticulesHandler() {
 		this.list = new LinkedList<Sphere>();
+		selected = -1;
 	}
 
 	public double random(double x, double y)
@@ -23,13 +25,15 @@ public class ParticulesHandler
 			list.get(i).render(gc, g);
 	}
 
-	public void update(GameContainer gc, double dt) throws SlickException {
+	public void update(double dt, double x, double y) throws SlickException {
 		for (int i = 0; i < list.size(); i++) {
 			// We check for collisions for all other spheres
 			for (int j = i + 1; j < list.size(); j++)
 				collision(list.get(i),list.get(j));
-
-			list.get(i).update(gc, dt);
+			if (list.get(i).selected)
+				list.get(i).update(x, y, dt);
+			else
+				list.get(i).update(dt);
 		}
 	}
 
@@ -92,6 +96,7 @@ public class ParticulesHandler
 	}
 
 	// Calculates the smallest time before a collision occurs collision 
+	@SuppressWarnings("unused")
 	private double[] timeToCollision() 
 	{
 		double[] res= { 9999, -1, -1 };
@@ -109,7 +114,7 @@ public class ParticulesHandler
 					D = Math.pow(list.get(i).posX, 2) + Math.pow(list.get(i).posY, 2) - Math.pow(list.get(i).size, 2) - 2 * list.get(i).posX * list.get(j).posX + Math.pow(list.get(j).posX, 2) - 2 * list.get(i).posY * list.get(j).posY + Math.pow(list.get(j).posY, 2) - 2 * list.get(i).size * list.get(j).size - Math.pow(list.get(j).size, 2); 
 					DISC = Math.pow((-2 * B), 2) - 4 * C * D;
 
-					 
+
 					if (DISC >= 0) {
 						// We want the smallest time
 						res[0] = Math.min(Math.min(res[0], 0.5 * (2 * B - Math.sqrt(DISC)) / A), 0.5 * (2 * B + Math.sqrt(DISC)) / A); 
@@ -128,15 +133,25 @@ public class ParticulesHandler
 	}
 
 	public void addtolist(int x, int y, int WIDTH, int HEIGHT, Image texture) {
-		double s = random(0.5f,1f);
-		double size = (96 * s) / 2;
-		// Prevents from creating a sphere if it overlaps another one
-		for (int i = 0; i < list.size(); i++) {
-			if (distance(list.get(i), x, y, size) <= Math.pow(list.get(i).size + size + Math.pow(10,-9), 2))
-				return;
+		if (selected == -1)
+		{
+			double s = random(0.25f,1f);
+			double size = (96 * s) / 2;
+			// Prevents from creating a sphere if it overlaps another one
+			for (int i = 0; i < list.size(); i++) {
+				if (distance(list.get(i), x - size, y - size, size) <= Math.pow(list.get(i).size + size, 2)) {
+					list.get(i).selected = true;
+					selected = i;
+					return;
+				}
+			}
+			Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.1f,0.9f), (float)s, texture);
+			this.list.addLast(p);
 		}
-		Sphere p = new Sphere(x, y, WIDTH, HEIGHT, random(0.2f,0.9f), (float)s, texture);
-		this.list.addLast(p);
+		else {
+			list.get(selected).selected = false;
+			selected = -1;
+		}
 	}
 
 	public void reset() {

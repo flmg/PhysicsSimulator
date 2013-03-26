@@ -31,11 +31,11 @@ public class Main extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input ip = gc.getInput();
-		particules.update(gc, bt * (double) delta / 1000f);
+		particules.update(bt * (double) delta / 1000f, ip.getMouseX(), ip.getMouseY());
 		fluids.update(gc, delta);
 
 		// Mouse left clicked
-		if (ip.isMouseButtonDown(0)) {
+		if (ip.isMousePressed(0)) {
 			particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
 					texture);
 		}
@@ -61,10 +61,16 @@ public class Main extends BasicGame {
 				bt = 1.0f;
 		}
 
+		// Press tab to restart
 		if (ip.isKeyPressed(Input.KEY_TAB)) {
 			bt = 1.0f;
 			particules.reset();
-			fluids.clear();
+			fluids.clear();	
+		}
+
+		// Press ESC to quit
+		if (ip.isKeyPressed(Input.KEY_ESCAPE)) {
+			System.exit(0);
 		}
 	}
 
