@@ -85,6 +85,8 @@ public class Main extends BasicGame {
 		g.drawString(String.format("Speed : %.2f", bt), 10, 60);
 		g.drawString("Particule Type : " + fluids.particuleType.toString()
 				+ " (Press M to switch)", 10, 85);
+		
+		g.drawLine(0, 300, 1024, 400);
 	}
 
 	public static void main(String[] args) throws SlickException {
