@@ -24,7 +24,7 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		this.fluids = new FluidsHandler(gc, 4);
+		this.fluids = new FluidsHandler(gc, 2);
 		bt = 1.0f;
 	}
 
@@ -32,20 +32,33 @@ public class Main extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input ip = gc.getInput();
 		particules.update(bt * (double) delta / 1000f, ip.getMouseX(), ip.getMouseY());
-		fluids.update(gc, delta);
+		fluids.update();
 
 		// Mouse left clicked
 		if (ip.isMousePressed(0)) {
 			particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
 					texture);
 		}
-		// Mouse right clicked (add sand)
+		// Mouse right clicked (add particule)
 		if (ip.isMouseButtonDown(1)) {
 			fluids.addParticule(ip.getMouseX()/fluids.scale, ip.getMouseY()/fluids.scale);
 		}
 		// mode selection
 		if (ip.isKeyPressed(Input.KEY_M)) {
 			fluids.changeParticules();
+		}
+		// scale selection
+		if (ip.isKeyPressed(Input.KEY_SUBTRACT)) {
+			if(fluids.scale >= 2) {
+				int new_scale = fluids.scale / 2;						
+				fluids = new FluidsHandler(gc, new_scale);
+			}
+		}
+		if (ip.isKeyPressed(Input.KEY_ADD)) {
+			if(fluids.scale <= 4) {
+				int new_scale = fluids.scale * 2;						
+				fluids = new FluidsHandler(gc, new_scale);
+			}
 		}
 
 		if (ip.isKeyPressed(Input.KEY_UP)) {
@@ -77,7 +90,7 @@ public class Main extends BasicGame {
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		particules.render(gc, g);
-		fluids.render(gc, g);
+		fluids.render(g);
 		g.setColor(Color.white);
 		g.drawString(
 				String.format("%d balls (TAB to reset session)",
@@ -85,6 +98,8 @@ public class Main extends BasicGame {
 		g.drawString(String.format("Speed : %.2f", bt), 10, 60);
 		g.drawString("Particule Type : " + fluids.particuleType.toString()
 				+ " (Press M to switch)", 10, 85);
+		g.drawString("scale : " + fluids.scale
+				+ " (Press + and - to change)", 10, 110);
 	}
 
 	public static void main(String[] args) throws SlickException {
