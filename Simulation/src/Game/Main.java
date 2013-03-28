@@ -9,7 +9,7 @@ import org.newdawn.slick.*;
 public class Main extends BasicGame {
 
 	private Image texture;
-	private ParticulesHandler particules = new ParticulesHandler();
+	private ParticulesHandler particules = new ParticulesHandler(1024, 500);
 	private double bt;
 	private FluidsHandler fluids;
 
@@ -85,8 +85,6 @@ public class Main extends BasicGame {
 		g.drawString(String.format("Speed : %.2f", bt), 10, 60);
 		g.drawString("Particule Type : " + fluids.particuleType.toString()
 				+ " (Press M to switch)", 10, 85);
-		
-		g.drawLine(0, 300, 1024, 400);
 	}
 
 	public static void main(String[] args) throws SlickException {

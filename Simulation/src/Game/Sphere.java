@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.LinkedList;
+
 import org.newdawn.slick.*;
 
 public class Sphere {
@@ -54,16 +56,18 @@ public class Sphere {
 		this.texture.draw((float)posX, (float)posY, (float)scale);
 	}
 
-	public void update(double dt) throws SlickException {
+	public void update(double dt, LinkedList<Line> lines) throws SlickException {
 
 		// Gravity
 		velY += 9.8 * dt * 100;
 
 		// Line collision
-		collisionL2S();
+		for (int i = 0; i < lines.size(); i++)
+			collisionL2S(lines.get(i));
 
 		// Movements
-		distPlane(dt);
+		posX += velX * dt;
+		posY += velY * dt;
 
 	}
 	public void update(double x, double y, double dt) throws SlickException {
@@ -77,64 +81,23 @@ public class Sphere {
 		old_posY = posY;
 	}
 
-	//Collision between objects and edges
-	private void distPlane(double dt)
+	private void collisionL2S(Line l)
 	{
-		// Left edge
-		if (posX - Math.pow(10,-9) <= 0 && (velX <= 0)) {
-			reflectionV(1, 0);
-			posX = Math.max(posX, 0); // Repositioning
-		}
-		// Right edge
-		else if (posX + size * 2  + Math.pow(10,-9) >= WIDTH && (velX >= 0)) {
-			reflectionV(-1, 0);
-			posX = Math.min(posX, WIDTH - size * 2); // Repositioning
-		}
-
-		// Bottom edge
-		if ((posY + size * 2 + Math.pow(10,-9) >= HEIGHT) && (velY >= 0)) {
-			reflectionV(0, -1);
-			posY = Math.min(posY, HEIGHT - size * 2); // Repositioning
-		}
-		// Top edge
-		else if (posY - Math.pow(10,-9)  <= 0 && (velY <= 0)) {
-			reflectionV(0, 1);
-			posY = Math.max(posY, 0); // Repositioning
-		}
-
-		posX += velX * dt;
-		posY += velY * dt;
-
-	}
-
-	private boolean collisionL2S()
-	{
-
-		double x0 = 0;
-		double y0 = 300;
-		double x1 = 1024;
-		double y1 = 400;
-
 		// Translate everything so that line segment start point to (0, 0)
-		double a = x1-x0; // Line segment end point horizontal coordinate
-		double b = y1-y0; // Line segment end point vertical coordinate
-		double c = (posX + size) - x0; // Circle center horizontal coordinate
-		double d = (posY + size) - y0; // Circle center vertical coordinate
+		double a = l.x1-l.x0; // Line segment end point horizontal coordinate
+		double b = l.y1-l.y0; // Line segment end point vertical coordinate
+		double c = (posX + size) - l.x0; // Circle center horizontal coordinate
+		double d = (posY + size) - l.y0; // Circle center vertical coordinate
 
 		if (Math.pow(d*a - c*b, 2) - Math.pow(size, 2)*(Math.pow(a, 2) + Math.pow(b, 2)) <= 0) {
 			// Collision is possible
-			double l0 = Math.sqrt(x0*x0 + y0*y0);
-			double l1 = Math.sqrt(x1*x1 + y1*y1);
-			
-			double sY = (-(y1 - y0) / l0);
-			double sX = ((x1 - x0) / l1);
+			double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+
+			double sY = -Math.signum(velX + Math.pow(10, -9))*((l.y1 - l.y0) / l0);
+			double sX = -Math.signum(velY + Math.pow(10, -9))*((l.x1 - l.x0) / l0);
+			closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
 			reflectionV(sY,sX);
-			
-			closestpointonline(x0,y0,x1,y1,posX + size,posY + size * 2);
-			
-			return true;
 		}
-		return false;
 	}
 
 	private void closestpointonline(double lx1, double ly1, double lx2, double ly2, double x0, double y0) { 
@@ -155,10 +118,20 @@ public class Sphere {
 			// We'd rather square the other side of the (in)equation
 			if (dX + dY > Math.pow(size, 2))
 			{
-				posX = cx - size;
-				posY = cy - size* 2;
+				if (A1 != 0) {
+					if (velX > 0)
+						posX = cx - size * 2;
+					else
+						posX = cx;
+				}
+				if (B1 != 0) {
+					if (velY > 0)
+						posY = cy - size * 2;
+					else
+						posY = cy;
+				}
 			}
-			
+
 		}
 	}
 

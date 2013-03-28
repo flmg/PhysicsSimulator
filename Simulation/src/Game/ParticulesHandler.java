@@ -2,17 +2,24 @@ package Game;
 
 import java.util.LinkedList;
 
+import Game.Line;
 import Game.Sphere;
 import org.newdawn.slick.*;
 
 public class ParticulesHandler 
 {	
 	private LinkedList<Sphere> list;
+	private LinkedList<Line> lines;
 	private int selected;
 
-	public ParticulesHandler() {
+	public ParticulesHandler(int w, int h) {
 		this.list = new LinkedList<Sphere>();
 		selected = -1;
+		this.lines = new LinkedList<Line>();
+		this.lines.add(new Line(0, 0, 0, h));
+		this.lines.add(new Line(0, 0, w, 0));
+		this.lines.add(new Line(w, 0, w, h));
+		this.lines.add(new Line(0, h, w, h));
 	}
 
 	public double random(double x, double y)
@@ -23,6 +30,11 @@ public class ParticulesHandler
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		for (int i = 0; i < list.size(); i++)
 			list.get(i).render(gc, g);
+		for (int i = 0; i < lines.size(); i++)
+		{
+			Line l = lines.get(i);
+			g.drawLine(l.x0, l.y0, l.x1, l.y1);
+		}
 	}
 
 	public void update(double dt, double x, double y) throws SlickException {
@@ -33,7 +45,7 @@ public class ParticulesHandler
 			if (list.get(i).selected)
 				list.get(i).update(x, y, dt);
 			else
-				list.get(i).update(dt);
+				list.get(i).update(dt, lines);
 		}
 	}
 
