@@ -65,6 +65,8 @@ public class Sphere {
 		for (int i = 0; i < lines.size(); i++)
 			collisionL2S(lines.get(i));
 
+		checkBounds();
+
 		// Movements
 		posX += velX * dt;
 		posY += velY * dt;
@@ -84,19 +86,30 @@ public class Sphere {
 	private void collisionL2S(Line l)
 	{
 		// Translate everything so that line segment start point to (0, 0)
-		double a = l.x1-l.x0; // Line segment end point horizontal coordinate
-		double b = l.y1-l.y0; // Line segment end point vertical coordinate
+		double a = l.x1 - l.x0; // Line segment end point horizontal coordinate
+		double b = l.y1 - l.y0; // Line segment end point vertical coordinate
 		double c = (posX + size) - l.x0; // Circle center horizontal coordinate
 		double d = (posY + size) - l.y0; // Circle center vertical coordinate
 
+		// If collision is possible
 		if (Math.pow(d*a - c*b, 2) - Math.pow(size, 2)*(Math.pow(a, 2) + Math.pow(b, 2)) <= 0) {
-			// Collision is possible
-			double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+			// We check if we're between the end-points
+			boolean q = posX >= l.x0, s = (posX + size * 2) <= l.x1, w = (posY  + size * 2) >= Math.min(l.y0,l.y1), v = posY <= Math.max(l.y0,l.y1);
+			if (l.isBound || (q && s && w && v)) {
 
-			double sY = -Math.signum(velX + Math.pow(10, -9))*((l.y1 - l.y0) / l0);
-			double sX = -Math.signum(velY + Math.pow(10, -9))*((l.x1 - l.x0) / l0);
-			closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
-			reflectionV(sY,sX);
+				double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+
+				short signX = (short) Math.signum(l.y0 - l.y1);
+				if (signX == 0)
+					signX = 1;
+
+				double sY = -signX*((l.y1 - l.y0) / l0);
+				double sX = signX*((l.x1 - l.x0) / l0);
+
+				closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
+				reflectionV(sY,sX);
+			}
+
 		}
 	}
 
@@ -118,17 +131,25 @@ public class Sphere {
 			// We'd rather square the other side of the (in)equation
 			if (dX + dY > Math.pow(size, 2))
 			{
-				if (A1 != 0) {
-					if (velX > 0)
-						posX = cx - size * 2;
-					else
-						posX = cx;
+				if (A1 == 0 || B1 == 0)
+				{
+					if (A1 != 0) {
+						if (velX > 0)
+							posX = cx - size * 2;
+						else
+							posX = cx;
+					}
+					if (B1 != 0) {
+						if (velY > 0)
+							posY = cy - size * 2;
+						else
+							posY = cy;
+					}
 				}
-				if (B1 != 0) {
-					if (velY > 0)
-						posY = cy - size * 2;
-					else
-						posY = cy;
+				else
+				{
+					posX = cx - size;
+					posY = cy - size * 2;
 				}
 			}
 
@@ -143,5 +164,17 @@ public class Sphere {
 
 		velX -= x * (1 / mass);
 		velY -= y * (1 / mass);
+	}
+
+	private void checkBounds()
+	{
+		if (posX < 0)
+			posX = 0;
+		if (posX + size * 2 > WIDTH)
+			posX = WIDTH - size * 2;
+		if (posY < 0)
+			posY = 0;
+		if (posY + size * 2 > HEIGHT)
+			posY = HEIGHT - size * 2;
 	}
 }

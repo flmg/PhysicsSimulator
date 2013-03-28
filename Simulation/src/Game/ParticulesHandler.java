@@ -16,10 +16,11 @@ public class ParticulesHandler
 		this.list = new LinkedList<Sphere>();
 		selected = -1;
 		this.lines = new LinkedList<Line>();
-		this.lines.add(new Line(0, 0, 0, h));
-		this.lines.add(new Line(0, 0, w, 0));
-		this.lines.add(new Line(w, 0, w, h));
-		this.lines.add(new Line(0, h, w, h));
+		this.lines.add(new Line(1, 0, 1, h, true));
+		this.lines.add(new Line(0, 1, w, 1, true));
+		this.lines.add(new Line(w - 1, 0, w - 1, h, true));
+		this.lines.add(new Line(0, h - 1, w, h - 1, true));
+		//this.lines.add(new Line(300, 450, 600, 300));
 	}
 
 	public double random(double x, double y)
