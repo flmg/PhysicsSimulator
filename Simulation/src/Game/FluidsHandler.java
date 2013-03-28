@@ -215,8 +215,23 @@ public class FluidsHandler {
 				new_mass[i][j] = 1.0f;
 			} else if (this.particuleType == type.Block) {
 				cells[i][j] = BLOCK;
-				mass[i][j] = 0f;
-				new_mass[i][j] = 0f;
+				if(i-1 >= 1 && j-1 >= 1)	//up left
+					cells[i-1][j-1] = BLOCK;
+				if(j-1 >= 1)				//up
+					cells[i][j-1] = BLOCK;
+				if(i+1 <= w && j-1 >= 1)	//up right
+					cells[i+1][j-1] = BLOCK;
+				if(i-1 >= 1)				//left
+					cells[i-1][j] = BLOCK;
+				if(i+1 <= w)				//right
+					cells[i+1][j] = BLOCK;
+				if(i-1 >= 1 && j+1 <= h)	//down left
+					cells[i-1][j+1] = BLOCK;
+				if(j+1 <= h)				//down
+					cells[i][j+1] = BLOCK;
+				if(i+1 <= w && j+1 <= h)	//down right
+					cells[i+1][j+1] = BLOCK;
+
 			}
 		}
 	}
@@ -247,7 +262,8 @@ public class FluidsHandler {
 			for (int i = 1; i <= w; i++) {
 				// if water
 				if (cells[i][j] == WATER) {
-					g.setColor(Color.blue);
+					Color c = new Color(0f,0f,1f,mass[i][j]);
+					g.setColor(c);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 				} else if (cells[i][j] == BLOCK) {
