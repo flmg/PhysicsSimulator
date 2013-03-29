@@ -36,8 +36,10 @@ public class Main extends BasicGame {
 
 		// Mouse left clicked
 		if (ip.isMousePressed(0)) {
-			particules.addtolist(ip.getMouseX(), ip.getMouseY(), 1024, 500,
-					texture);
+			if (ip.isKeyDown(Input.KEY_LCONTROL))
+				particules.addLine(ip.getMouseX(), ip.getMouseY());
+			else
+				particules.addSphere(ip.getMouseX(), ip.getMouseY(), 1024, 500,	texture);
 		}
 		// Mouse right clicked (add particule)
 		if (ip.isMouseButtonDown(1)) {

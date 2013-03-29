@@ -8,19 +8,33 @@ import org.newdawn.slick.*;
 
 public class ParticulesHandler 
 {	
-	private LinkedList<Sphere> list;
+	private LinkedList<Sphere> spheres;
 	private LinkedList<Line> lines;
 	private int selected;
+	private float tempX0;
+	private float tempY0;
+	int w,h;
 
 	public ParticulesHandler(int w, int h) {
-		this.list = new LinkedList<Sphere>();
-		selected = -1;
+		this.spheres = new LinkedList<Sphere>();
 		this.lines = new LinkedList<Line>();
+		
+		this.w = w;
+		this.h = h;
+		genBoundaries();
+		
+		selected = -1;
+		this.tempX0 = -1;
+		this.tempY0 = -1;
+	}
+	
+
+	private void genBoundaries()
+	{
 		this.lines.add(new Line(1, 0, 1, h, true));
 		this.lines.add(new Line(0, 1, w, 1, true));
 		this.lines.add(new Line(w - 1, 0, w - 1, h, true));
 		this.lines.add(new Line(0, h - 1, w, h - 1, true));
-		//this.lines.add(new Line(300, 450, 600, 300));
 	}
 
 	public double random(double x, double y)
@@ -29,8 +43,8 @@ public class ParticulesHandler
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		for (int i = 0; i < list.size(); i++)
-			list.get(i).render(gc, g);
+		for (int i = 0; i < spheres.size(); i++)
+			spheres.get(i).render(gc, g);
 		for (int i = 0; i < lines.size(); i++)
 		{
 			Line l = lines.get(i);
@@ -39,14 +53,14 @@ public class ParticulesHandler
 	}
 
 	public void update(double dt, double x, double y) throws SlickException {
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < spheres.size(); i++) {
 			// We check for collisions for all other spheres
-			for (int j = i + 1; j < list.size(); j++)
-				collision(list.get(i),list.get(j));
-			if (list.get(i).selected)
-				list.get(i).update(x, y, dt);
+			for (int j = i + 1; j < spheres.size(); j++)
+				collision(spheres.get(i),spheres.get(j));
+			if (spheres.get(i).selected)
+				spheres.get(i).update(x, y, dt);
 			else
-				list.get(i).update(dt, lines);
+				spheres.get(i).update(dt, lines);
 		}
 	}
 
@@ -115,16 +129,16 @@ public class ParticulesHandler
 		double[] res= { 9999, -1, -1 };
 		double A, B, C, D, DISC; 
 
-		for (int i = 0; i < list.size(); i++) {
-			for (int j = i + 1; j < list.size(); j++) {
+		for (int i = 0; i < spheres.size(); i++) {
+			for (int j = i + 1; j < spheres.size(); j++) {
 
-				if (movingToBall(list.get(i), list.get(j))) 
+				if (movingToBall(spheres.get(i), spheres.get(j))) 
 				{
 					// Breaking down the very long formula for t  
-					A = Math.pow(list.get(i).velX, 2) + Math.pow(list.get(i).velY, 2) - 2 * list.get(i).velX * list.get(j).velX + Math.pow(list.get(j).velX, 2) - 2 * list.get(i).velY * list.get(j).velY + Math.pow(list.get(j).velY, 2); 
-					B = -list.get(i).posX * list.get(i).velX - list.get(i).posY * list.get(i).velY + list.get(i).velX * list.get(j).posX + list.get(i).velY * list.get(j).posY + list.get(i).posX * list.get(j).velX - list.get(j).posX * list.get(j).velX + list.get(i).posY * list.get(j).velY - list.get(j).posY * list.get(j).velY; 
-					C = Math.pow(list.get(i).velX, 2) + Math.pow(list.get(i).velY, 2) - 2 * list.get(i).velX * list.get(j).velX + Math.pow(list.get(j).velX, 2) - 2 * list.get(i).velY * list.get(j).velY + Math.pow(list.get(j).velY, 2);
-					D = Math.pow(list.get(i).posX, 2) + Math.pow(list.get(i).posY, 2) - Math.pow(list.get(i).size, 2) - 2 * list.get(i).posX * list.get(j).posX + Math.pow(list.get(j).posX, 2) - 2 * list.get(i).posY * list.get(j).posY + Math.pow(list.get(j).posY, 2) - 2 * list.get(i).size * list.get(j).size - Math.pow(list.get(j).size, 2); 
+					A = Math.pow(spheres.get(i).velX, 2) + Math.pow(spheres.get(i).velY, 2) - 2 * spheres.get(i).velX * spheres.get(j).velX + Math.pow(spheres.get(j).velX, 2) - 2 * spheres.get(i).velY * spheres.get(j).velY + Math.pow(spheres.get(j).velY, 2); 
+					B = -spheres.get(i).posX * spheres.get(i).velX - spheres.get(i).posY * spheres.get(i).velY + spheres.get(i).velX * spheres.get(j).posX + spheres.get(i).velY * spheres.get(j).posY + spheres.get(i).posX * spheres.get(j).velX - spheres.get(j).posX * spheres.get(j).velX + spheres.get(i).posY * spheres.get(j).velY - spheres.get(j).posY * spheres.get(j).velY; 
+					C = Math.pow(spheres.get(i).velX, 2) + Math.pow(spheres.get(i).velY, 2) - 2 * spheres.get(i).velX * spheres.get(j).velX + Math.pow(spheres.get(j).velX, 2) - 2 * spheres.get(i).velY * spheres.get(j).velY + Math.pow(spheres.get(j).velY, 2);
+					D = Math.pow(spheres.get(i).posX, 2) + Math.pow(spheres.get(i).posY, 2) - Math.pow(spheres.get(i).size, 2) - 2 * spheres.get(i).posX * spheres.get(j).posX + Math.pow(spheres.get(j).posX, 2) - 2 * spheres.get(i).posY * spheres.get(j).posY + Math.pow(spheres.get(j).posY, 2) - 2 * spheres.get(i).size * spheres.get(j).size - Math.pow(spheres.get(j).size, 2); 
 					DISC = Math.pow((-2 * B), 2) - 4 * C * D;
 
 
@@ -142,33 +156,51 @@ public class ParticulesHandler
 
 	// Basic public operation on list
 	public int count() {
-		return list.size(); 
+		return spheres.size(); 
 	}
 
-	public void addtolist(int x, int y, int WIDTH, int HEIGHT, Image texture) {
+	public void addSphere(int x, int y, int WIDTH, int HEIGHT, Image texture) {
 		if (selected == -1)
 		{
-			double s = random(0.25f,1f);
+			double s = random(0.25f,0.75f);
 			double size = (96 * s) / 2;
 			// Prevents from creating a sphere if it overlaps another one
-			for (int i = 0; i < list.size(); i++) {
-				if (distance(list.get(i), x - size, y - size, size) <= Math.pow(list.get(i).size + size, 2)) {
-					list.get(i).selected = true;
+			for (int i = 0; i < spheres.size(); i++) {
+				if (distance(spheres.get(i), x - size, y - size, size) <= Math.pow(spheres.get(i).size + size, 2)) {
+					spheres.get(i).selected = true;
 					selected = i;
 					return;
 				}
 			}
 			Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.1f,0.9f), (float)s, texture);
-			this.list.addLast(p);
+			this.spheres.add(p);
 		}
 		else {
-			list.get(selected).selected = false;
+			spheres.get(selected).selected = false;
 			selected = -1;
+		}
+	}
+	public void addLine(int x, int y)
+	{
+		// First step : start point
+		if (tempX0 == -1)
+		{
+			tempX0 = x;
+			tempY0 = y;
+		}
+		// Second step : end point
+		else
+		{
+			this.lines.add(new Line(tempX0, tempY0, x, y, false));
+			tempX0 = -1;
+			tempY0 = -1;
 		}
 	}
 
 	public void reset() {
-		this.list.clear();
+		this.spheres.clear();
+		this.lines.clear();
+		genBoundaries();
 	}
 	// ==============================
 

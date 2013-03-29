@@ -94,23 +94,38 @@ public class Sphere {
 		// If collision is possible
 		if (Math.pow(d*a - c*b, 2) - Math.pow(size, 2)*(Math.pow(a, 2) + Math.pow(b, 2)) <= 0) {
 			// We check if we're between the end-points
-			boolean q = posX >= l.x0, s = (posX + size * 2) <= l.x1, w = (posY  + size * 2) >= Math.min(l.y0,l.y1), v = posY <= Math.max(l.y0,l.y1);
-			if (l.isBound || (q && s && w && v)) {
+			boolean inMiddle = 
+					posX >= l.x0 && 						   
+					posX + size * 2 <= l.x1 &&
+					posY + size * 2 >= Math.min(l.y0,l.y1) &&
+					posY <= Math.max(l.y0,l.y1);
+			// We check if we're near the end-points
+			boolean atStart = inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
+					if (l.isBound || inMiddle || atStart) {
 
-				double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+						double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
 
-				short signX = (short) Math.signum(l.y0 - l.y1);
-				if (signX == 0)
-					signX = 1;
+						short signX = (short) Math.signum(l.y0 - l.y1);
+						if (signX == 0)
+							signX = 1;
 
-				double sY = -signX*((l.y1 - l.y0) / l0);
-				double sX = signX*((l.x1 - l.x0) / l0);
+						double sY = -signX*((l.y1 - l.y0) / l0);
+						double sX = signX*((l.x1 - l.x0) / l0);
 
-				closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
-				reflectionV(sY,sX);
-			}
+						closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
+						reflectionV(sY,sX);
+					}
 
 		}
+	}
+	
+	private boolean inRange(double x, double y, double range) 
+	{
+		double dX = Math.pow(((x + size) - (posX + size)), 2);
+		double dY = Math.pow(((y + size) - (posY + size)), 2);
+		// We don't root square because it's a very slow operation 
+		// We'd rather square the other side of the (in)equation
+		return (dX + dY <= Math.pow(range, 2));
 	}
 
 	private void closestpointonline(double lx1, double ly1, double lx2, double ly2, double x0, double y0) { 
@@ -124,12 +139,8 @@ public class Sphere {
 		{ 
 			double cx = (double)((A1*C1 - B1*C2)/det); 
 			double cy = (double)((A1*C2 - -B1*C1)/det); 
-
-			double dX = Math.pow(((cx + size) - (posX + size)), 2);
-			double dY = Math.pow(((cy + size) - (posY + size)), 2);
-			// We don't root square because it's a very slow operation 
-			// We'd rather square the other side of the (in)equation
-			if (dX + dY > Math.pow(size, 2))
+			
+			if (inRange(cx, cy, size))
 			{
 				if (A1 == 0 || B1 == 0)
 				{
