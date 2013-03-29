@@ -21,10 +21,12 @@ public class FluidsHandler {
 
 	// Water properties
 	final float MaxMass = 1.0f; // The normal, un-pressurized mass of a full
-								// water cell
+								// water cell (default 1.0f)
 	final float MaxCompress = 0.02f; // How much excess water a cell can store,
 										// compared to the cell above it
-	final float MinMass = 0.0001f; // Ignore cells that are almost dry
+										// (default 0.02f)
+	final float MinMass = 0.0001f; // Ignore cells that are almost dry (default
+									// 0.0001f)
 
 	final float MaxSpeed = 1f; // max units of water moved out of one block to
 								// another, per timestep
@@ -32,7 +34,7 @@ public class FluidsHandler {
 	final float MinFlow = 0.01f;
 
 	public enum type {
-		Water, Block
+		Water, Block, Eraser
 	};
 
 	public type particuleType;
@@ -113,9 +115,10 @@ public class FluidsHandler {
 				if ((cells[x][y + 1] != BLOCK)) {
 					Flow = get_stable_state_b(remaining_mass + mass[x][y + 1])
 							- mass[x][y + 1];
-					if (Flow > MinFlow) {
-						Flow *= 0.5; // leads to smoother flow
-					}
+					/*
+					 * if (Flow > MinFlow) Flow *= 0.5; // leads to smoother
+					 * flow
+					 */
 					Flow = constrain(Flow, 0,
 							Math.min(MaxSpeed, remaining_mass));
 
@@ -132,9 +135,9 @@ public class FluidsHandler {
 					// Equalize the amount of water in this block and it's
 					// neighbour
 					Flow = (mass[x][y] - mass[x - 1][y]) / 4;
-					if (Flow > MinFlow) {
-						Flow *= 0.5;
-					}
+					/*
+					 * if (Flow > MinFlow) Flow *= 0.5;
+					 */
 					Flow = constrain(Flow, 0, remaining_mass);
 
 					new_mass[x][y] -= Flow;
@@ -150,9 +153,9 @@ public class FluidsHandler {
 					// Equalize the amount of water in this block and it's
 					// neighbour
 					Flow = (mass[x][y] - mass[x + 1][y]) / 4;
-					if (Flow > MinFlow) {
-						Flow *= 0.5;
-					}
+					/*
+					 * if (Flow > MinFlow) Flow *= 0.5;
+					 */
 					Flow = constrain(Flow, 0, remaining_mass);
 
 					new_mass[x][y] -= Flow;
@@ -168,9 +171,9 @@ public class FluidsHandler {
 					Flow = remaining_mass
 							- get_stable_state_b(remaining_mass
 									+ mass[x][y - 1]);
-					if (Flow > MinFlow) {
-						Flow *= 0.5;
-					}
+					/*
+					 * if (Flow > MinFlow) Flow *= 0.5;
+					 */
 					Flow = constrain(Flow, 0,
 							Math.min(MaxSpeed, remaining_mass));
 
@@ -178,7 +181,6 @@ public class FluidsHandler {
 					new_mass[x][y - 1] += Flow;
 					remaining_mass -= Flow;
 				}
-
 			}
 		}
 
@@ -204,43 +206,80 @@ public class FluidsHandler {
 		}
 	}
 
+	public void clearCell(int i, int j) {
+		cells[i][j] = AIR;
+		mass[i][j] = 0f;
+	}
+
 	public void addParticule(int i, int j) {
-		//Borders
+		// Ignore borders
 		i++;
 		j++;
-		if (cells[i][j] == AIR) {
-			if (this.particuleType == type.Water) {
+		switch (this.particuleType) {
+		case Water:
+			if (cells[i][j] == AIR) {
 				cells[i][j] = WATER;
 				mass[i][j] = 1.0f;
 				new_mass[i][j] = 1.0f;
-			} else if (this.particuleType == type.Block) {
-				cells[i][j] = BLOCK;
-				if(i-1 >= 1 && j-1 >= 1)	//up left
-					cells[i-1][j-1] = BLOCK;
-				if(j-1 >= 1)				//up
-					cells[i][j-1] = BLOCK;
-				if(i+1 <= w && j-1 >= 1)	//up right
-					cells[i+1][j-1] = BLOCK;
-				if(i-1 >= 1)				//left
-					cells[i-1][j] = BLOCK;
-				if(i+1 <= w)				//right
-					cells[i+1][j] = BLOCK;
-				if(i-1 >= 1 && j+1 <= h)	//down left
-					cells[i-1][j+1] = BLOCK;
-				if(j+1 <= h)				//down
-					cells[i][j+1] = BLOCK;
-				if(i+1 <= w && j+1 <= h)	//down right
-					cells[i+1][j+1] = BLOCK;
-
 			}
+			break;
+		case Eraser:
+			clearCell(i, j);
+			if (i - 1 >= 1 && j - 1 >= 1) // up left
+				clearCell(i - 1, j - 1);
+			if (j - 1 >= 1) // up
+				clearCell(i, j - 1);
+			if (i + 1 <= w && j - 1 >= 1) // up right
+				clearCell(i + 1, j - 1);
+			if (i - 1 >= 1) // left
+				clearCell(i - 1, j);
+			if (i + 1 <= w) // right
+				clearCell(i + 1, j);
+			if (i - 1 >= 1 && j + 1 <= h) // down left
+				clearCell(i - 1, j + 1);
+			if (j + 1 <= h) // down
+				clearCell(i, j + 1);
+			if (i + 1 <= w && j + 1 <= h) // down right
+				clearCell(i + 1, j + 1);
+			break;
+		case Block:
+			cells[i][j] = BLOCK;
+			if (i - 1 >= 1 && j - 1 >= 1) // up left
+				cells[i - 1][j - 1] = BLOCK;
+			if (j - 1 >= 1) // up
+				cells[i][j - 1] = BLOCK;
+			if (i + 1 <= w && j - 1 >= 1) // up right
+				cells[i + 1][j - 1] = BLOCK;
+			if (i - 1 >= 1) // left
+				cells[i - 1][j] = BLOCK;
+			if (i + 1 <= w) // right
+				cells[i + 1][j] = BLOCK;
+			if (i - 1 >= 1 && j + 1 <= h) // down left
+				cells[i - 1][j + 1] = BLOCK;
+			if (j + 1 <= h) // down
+				cells[i][j + 1] = BLOCK;
+			if (i + 1 <= w && j + 1 <= h) // down right
+				cells[i + 1][j + 1] = BLOCK;
+			break;
+		default:
+			break;
 		}
 	}
 
 	public void changeParticules() {
-		if (particuleType == type.Water)
+		switch (particuleType) {
+		case Water:
 			particuleType = type.Block;
-		else
+			break;
+		case Block:
+			particuleType = type.Eraser;
+			break;
+		case Eraser:
 			particuleType = type.Water;
+			break;
+		default:
+			break;
+		}
 	}
 
 	// Take an amount of water and calculate how it should be split among two
@@ -262,7 +301,7 @@ public class FluidsHandler {
 			for (int i = 1; i <= w; i++) {
 				// if water
 				if (cells[i][j] == WATER) {
-					Color c = new Color(0f,0f,1f,mass[i][j]);
+					Color c = new Color(0f, 0f, 1f, mass[i][j]);
 					g.setColor(c);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
