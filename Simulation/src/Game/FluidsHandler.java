@@ -1,5 +1,6 @@
 package Game;
 
+import Game.Water;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -19,19 +20,8 @@ public class FluidsHandler {
 	public int[][] cells;
 	public float[][] mass, new_mass;
 
-	// Water properties
-	final float MaxMass = 1.0f; // The normal, un-pressurized mass of a full
-								// water cell (default 1.0f)
-	final float MaxCompress = 0.02f; // How much excess water a cell can store,
-										// compared to the cell above it
-										// (default 0.02f)
-	final float MinMass = 0.0001f; // Ignore cells that are almost dry (default
-									// 0.0001f)
-
-	final float MaxSpeed = 1f; // max units of water moved out of one block to
-								// another, per timestep
-
-	final float MinFlow = 0.01f;
+	// Fluids
+	public Water water = new Water(1.0f, 0.02f, 0.0001f, 1f, 0.01f);
 
 	public enum type {
 		Water, Block, Eraser
@@ -77,127 +67,31 @@ public class FluidsHandler {
 
 	}
 
-	public float constrain(float x, float low, float high) {
-		if (x < low)
-			return low;
-		else if (x > high)
-			return high;
-		else
-			return x;
-	}
-
-	/*
-	 * Compression-based fluid dynamic simulator. uses w, h, mass, new_mass,
-	 * cells, MaxMass, MaxCompression
-	 * 
-	 * cells can contain more than MaxMass water.
-	 */
 	public void update() throws SlickException {
-
-		float Flow = 0;
-		float remaining_mass;
 
 		// Calculate and apply flow for each block
 		for (int x = 1; x <= w; x++) {
 			for (int y = 1; y <= h; y++) {
-
 				// Skip inert ground cells
 				if (cells[x][y] == BLOCK)
 					continue;
-
-				// Custom push-only flow
-				Flow = 0;
-				remaining_mass = mass[x][y];
-				if (remaining_mass <= 0)
-					continue;
-
-				// The block below this one
-				if ((cells[x][y + 1] != BLOCK)) {
-					Flow = get_stable_state_b(remaining_mass + mass[x][y + 1])
-							- mass[x][y + 1];
-					/*
-					 * if (Flow > MinFlow) Flow *= 0.5; // leads to smoother
-					 * flow
-					 */
-					Flow = constrain(Flow, 0,
-							Math.min(MaxSpeed, remaining_mass));
-
-					new_mass[x][y] -= Flow;
-					new_mass[x][y + 1] += Flow;
-					remaining_mass -= Flow;
-				}
-
-				if (remaining_mass <= 0)
-					continue;
-
-				// Left
-				if (cells[x - 1][y] != BLOCK) {
-					// Equalize the amount of water in this block and it's
-					// neighbour
-					Flow = (mass[x][y] - mass[x - 1][y]) / 4;
-					/*
-					 * if (Flow > MinFlow) Flow *= 0.5;
-					 */
-					Flow = constrain(Flow, 0, remaining_mass);
-
-					new_mass[x][y] -= Flow;
-					new_mass[x - 1][y] += Flow;
-					remaining_mass -= Flow;
-				}
-
-				if (remaining_mass <= 0)
-					continue;
-
-				// Right
-				if (cells[x + 1][y] != BLOCK) {
-					// Equalize the amount of water in this block and it's
-					// neighbour
-					Flow = (mass[x][y] - mass[x + 1][y]) / 4;
-					/*
-					 * if (Flow > MinFlow) Flow *= 0.5;
-					 */
-					Flow = constrain(Flow, 0, remaining_mass);
-
-					new_mass[x][y] -= Flow;
-					new_mass[x + 1][y] += Flow;
-					remaining_mass -= Flow;
-				}
-
-				if (remaining_mass <= 0)
-					continue;
-
-				// Up. Only compressed water flows upwards.
-				if (cells[x][y - 1] != BLOCK) {
-					Flow = remaining_mass
-							- get_stable_state_b(remaining_mass
-									+ mass[x][y - 1]);
-					/*
-					 * if (Flow > MinFlow) Flow *= 0.5;
-					 */
-					Flow = constrain(Flow, 0,
-							Math.min(MaxSpeed, remaining_mass));
-
-					new_mass[x][y] -= Flow;
-					new_mass[x][y - 1] += Flow;
-					remaining_mass -= Flow;
-				}
+				else
+					water.update(x, y, cells, mass, new_mass);
 			}
 		}
-
 		// Copy the new mass values to the mass array
 		for (int x = 1; x <= w; x++) {
 			for (int y = 1; y <= h; y++) {
 				mass[x][y] = new_mass[x][y];
 			}
 		}
-
 		for (int x = 1; x <= w; x++) {
 			for (int y = 1; y <= h; y++) {
 				// Skip ground cells
 				if (cells[x][y] == BLOCK)
 					continue;
 				// Flag/unflag water cells
-				if (mass[x][y] > MinMass) {
+				if (mass[x][y] > water.MinMass) {
 					cells[x][y] = WATER;
 				} else {
 					cells[x][y] = AIR;
@@ -282,20 +176,6 @@ public class FluidsHandler {
 		}
 	}
 
-	// Take an amount of water and calculate how it should be split among two
-	// vertically adjacent cells. Returns the amount of water that should be in
-	// the bottom cell.
-	float get_stable_state_b(float total_mass) {
-		if (total_mass <= 1) {
-			return 1;
-		} else if (total_mass < 2 * MaxMass + MaxCompress) {
-			return (MaxMass * MaxMass + total_mass * MaxCompress)
-					/ (MaxMass + MaxCompress);
-		} else {
-			return (total_mass + MaxCompress) / 2;
-		}
-	}
-
 	public void render(Graphics g) throws SlickException {
 		for (int j = 1; j <= h; j++) {
 			for (int i = 1; i <= w; i++) {
@@ -310,10 +190,7 @@ public class FluidsHandler {
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 				}
-
 			}
 		}
-
 	}
-
 }

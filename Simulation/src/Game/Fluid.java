@@ -1,80 +1,44 @@
 package Game;
 
-import java.util.Random;
-
-import org.newdawn.slick.*;
-
 public class Fluid {
 
-	public int w, h;
-	public Color c;
-	public int scale;
-	public int type;
+	// Properties
+	final float MaxMass;
+	final float MaxCompress;
+	final float MinMass;
+	final float MaxSpeed;
+	final float MinFlow;
 
-	public Fluid(GameContainer gc, Color col, int[][] m, int s, int t) {
-		this.scale = s;
-		w = gc.getWidth() / scale;
-		h = gc.getHeight() / scale;
-		this.c = col;
-		this.type = t;
+	// Block types
+	final int AIR = 0;
+	final int BLOCK = 1;
+	final int WATER = 2;
+
+	public Fluid(float MaxM, float MaxC, float MinM, float MaxS, float MinF) {
+		MaxMass = MaxM;
+		MaxCompress = MaxC;
+		MinMass = MinM;
+		MaxSpeed = MaxS;
+		MinFlow = MinF;
 	}
 
-	public boolean getRandomBoolean() {
-		Random random = new Random();
-		return random.nextBoolean();
+	public float constrain(float x, float low, float high) {
+		if (x < low)
+			return low;
+		else if (x > high)
+			return high;
+		else
+			return x;
 	}
 
-	public void add(int x, int y, int[][] map) {
-			
-			map[x][y] = type;
-	}
-
-	public void free(int x, int y, int[][] map) {
-		map[x][y] = 0;
-	}
-	// return true if success
-	public boolean adddown(int i, int j, int[][] map) {
-		if (j + 1 < h && map[i][j + 1] == 0) {
-			add(i, j + 1, map);
-			free(i, j, map);
-			return true;
+	public float get_stable_state_b(float total_mass) {
+		if (total_mass <= 1) {
+			return 1;
+		} else if (total_mass < 2 * MaxMass + MaxCompress) {
+			return (MaxMass * MaxMass + total_mass * MaxCompress)
+					/ (MaxMass + MaxCompress);
+		} else {
+			return (total_mass + MaxCompress) / 2;
 		}
-		return false;
-	}
-
-	public boolean addright(int i, int j, int[][] map) {
-		if (i + 1 < w && map[i + 1][j] == 0) {
-			add(i + 1, j, map);
-			free(i, j, map);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean addleft(int i, int j, int[][] map) {
-		if (i - 1 >= 0 && map[i - 1][j] == 0) {
-			add(i - 1, j, map);
-			free(i, j, map);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean add_down_right(int i, int j, int[][] map) {
-		if (i + 1 < w && j + 1 < h && map[i + 1][j + 1] == 0) {
-			add(i + 1, j + 1, map);
-			free(i, j, map);
-			return true;
-		}
-		return false;
-	}
-
-	public boolean add_down_left(int i, int j, int[][] map) {
-		if (i - 1 >= 0 && j + 1 < h && map[i - 1][j + 1] == 0) {
-			add(i - 1, j + 1, map);
-			free(i, j, map);
-			return true;
-		}
-		return false;
 	}
 }
