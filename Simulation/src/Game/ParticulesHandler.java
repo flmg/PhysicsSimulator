@@ -42,7 +42,7 @@ public class ParticulesHandler
 		return (Math.random() * (y-x)) + x;
 	}
 
-	public void render(GameContainer gc, Graphics g) throws SlickException {
+	public void render(GameContainer gc, Graphics g, int x, int y) throws SlickException {
 		for (int i = 0; i < spheres.size(); i++)
 			spheres.get(i).render(gc, g);
 		for (int i = 0; i < lines.size(); i++)
@@ -50,6 +50,8 @@ public class ParticulesHandler
 			Line l = lines.get(i);
 			g.drawLine(l.x0, l.y0, l.x1, l.y1);
 		}
+		if (tempX0 != -1)
+			g.drawLine(tempX0, tempY0, x, y);
 	}
 
 	public void update(double dt, double x, double y) throws SlickException {
@@ -172,7 +174,8 @@ public class ParticulesHandler
 					return;
 				}
 			}
-			Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.1f,0.9f), (float)s, texture);
+			
+			Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture);
 			this.spheres.add(p);
 		}
 		else {

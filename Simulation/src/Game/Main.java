@@ -12,6 +12,7 @@ public class Main extends BasicGame {
 	private ParticulesHandler particules = new ParticulesHandler(1024, 500);
 	private double bt;
 	private FluidsHandler fluids;
+	private int mouseX, mouseY;
 
 	public Main() {
 		super("Physics Simulation");
@@ -31,19 +32,21 @@ public class Main extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		Input ip = gc.getInput();
-		particules.update(bt * (double) delta / 1000f, ip.getMouseX(), ip.getMouseY());
+		mouseX = ip.getMouseX();
+		mouseY = ip.getMouseY();
+		particules.update(bt * (double) delta / 1000f, mouseX, mouseY);
 		fluids.update();
 
 		// Mouse left clicked
 		if (ip.isMousePressed(0)) {
 			if (ip.isKeyDown(Input.KEY_LCONTROL))
-				particules.addLine(ip.getMouseX(), ip.getMouseY());
+				particules.addLine(mouseX, mouseY);
 			else
-				particules.addSphere(ip.getMouseX(), ip.getMouseY(), 1024, 500,	texture);
+				particules.addSphere(mouseX, mouseY, 1024, 500,	texture);
 		}
 		// Mouse right clicked (add particule)
 		if (ip.isMouseButtonDown(1)) {
-			fluids.addParticule(ip.getMouseX()/fluids.scale, ip.getMouseY()/fluids.scale);
+			fluids.addParticule(mouseX/fluids.scale, mouseY/fluids.scale);
 		}
 		// mode selection
 		if (ip.isKeyPressed(Input.KEY_M)) {
@@ -91,17 +94,20 @@ public class Main extends BasicGame {
 
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		particules.render(gc, g);
+		particules.render(gc, g, mouseX, mouseY);
 		fluids.render(g);
 		g.setColor(Color.white);
 		g.drawString(
 				String.format("%d balls (TAB to reset session)",
 						particules.count()), 10, 35);
-		g.drawString(String.format("Speed : %.2f", bt), 10, 60);
+		g.drawString(
+				String.format("Click to create balls ; Ctrl+Click to draw a line",
+						particules.count()), 10, 60);
+		g.drawString(String.format("Speed : %.2f", bt), 10, 85);
 		g.drawString("Particule Type : " + fluids.particuleType.toString()
-				+ " (Press M to switch)", 10, 85);
+				+ " (Press M to switch)", 10, 110);
 		g.drawString("scale : " + fluids.scale
-				+ " (Press + and - to change)", 10, 110);
+				+ " (Press + and - to change)", 10, 135);
 	}
 
 	public static void main(String[] args) throws SlickException {

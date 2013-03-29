@@ -100,7 +100,7 @@ public class Sphere {
 					posY + size * 2 >= Math.min(l.y0,l.y1) &&
 					posY <= Math.max(l.y0,l.y1);
 			// We check if we're near the end-points
-			boolean atStart = inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
+			boolean atStart = false;//inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
 					if (l.isBound || inMiddle || atStart) {
 
 						double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
@@ -140,7 +140,7 @@ public class Sphere {
 			double cx = (double)((A1*C1 - B1*C2)/det); 
 			double cy = (double)((A1*C2 - -B1*C1)/det); 
 			
-			if (inRange(cx, cy, size))
+			if (inRange(cx, cy, size) && posY > cy)
 			{
 				if (A1 == 0 || B1 == 0)
 				{
