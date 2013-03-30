@@ -18,16 +18,16 @@ public class ParticulesHandler
 	public ParticulesHandler(int w, int h) {
 		this.spheres = new LinkedList<Sphere>();
 		this.lines = new LinkedList<Line>();
-		
+
 		this.w = w;
 		this.h = h;
 		genBoundaries();
-		
+
 		selected = -1;
 		this.tempX0 = -1;
 		this.tempY0 = -1;
 	}
-	
+
 
 	private void genBoundaries()
 	{
@@ -162,26 +162,31 @@ public class ParticulesHandler
 	}
 
 	public void addSphere(int x, int y, int WIDTH, int HEIGHT, Image texture) {
-		if (selected == -1)
+		if (tempX0 == -1)
 		{
-			double s = random(0.25f,0.75f);
-			double size = (96 * s) / 2;
-			// Prevents from creating a sphere if it overlaps another one
-			for (int i = 0; i < spheres.size(); i++) {
-				if (distance(spheres.get(i), x - size, y - size, size) <= Math.pow(spheres.get(i).size + size, 2)) {
-					spheres.get(i).selected = true;
-					selected = i;
-					return;
+			if (selected == -1)
+			{
+				double s = random(0.25f,0.75f);
+				double size = (96 * s) / 2;
+				// Prevents from creating a sphere if it overlaps another one
+				for (int i = 0; i < spheres.size(); i++) {
+					if (distance(spheres.get(i), x - size, y - size, size) <= Math.pow(spheres.get(i).size + size, 2)) {
+						spheres.get(i).selected = true;
+						selected = i;
+						return;
+					}
 				}
+
+				Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture);
+				this.spheres.add(p);
 			}
-			
-			Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture);
-			this.spheres.add(p);
+			else {
+				spheres.get(selected).selected = false;
+				selected = -1;
+			}
 		}
-		else {
-			spheres.get(selected).selected = false;
-			selected = -1;
-		}
+		else
+			addLine(x,y);
 	}
 	public void addLine(int x, int y)
 	{
