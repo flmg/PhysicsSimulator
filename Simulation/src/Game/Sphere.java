@@ -55,7 +55,7 @@ public class Sphere {
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		this.texture.draw((float)posX, (float)posY, (float)scale);
 	}
-
+	// Normal update
 	public void update(double dt, LinkedList<Line> lines) throws SlickException {
 
 		// Gravity
@@ -72,6 +72,7 @@ public class Sphere {
 		posY += velY * dt;
 
 	}
+	// Update for selected mode
 	public void update(double x, double y, double dt) throws SlickException {
 		posX = x - size;
 		posY = y - size;
@@ -94,31 +95,28 @@ public class Sphere {
 		// If collision is possible
 		if (Math.pow(d*a - c*b, 2) - Math.pow(size, 2)*(Math.pow(a, 2) + Math.pow(b, 2)) <= 0) {
 			// We check if we're between the end-points
-			boolean inMiddle = 
-					posX >= l.x0 && 						   
-					posX + size * 2 <= l.x1 &&
-					posY + size * 2 >= Math.min(l.y0,l.y1) &&
-					posY <= Math.max(l.y0,l.y1);
+			boolean inMiddle = posX >= l.x0 && posX + size * 2 <= l.x1 && posY + size * 2 >= Math.min(l.y0,l.y1) && posY <= Math.max(l.y0,l.y1);
 			// We check if we're near the end-points
 			boolean atStart = inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
-					if (l.isBound || inMiddle || atStart) {
+			// We eliminate the problem with the completely straight lines
+			if (l.isBound || inMiddle || atStart) {
 
-						double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+				double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
 
-						short signX = (short) Math.signum(l.y0 - l.y1);
-						if (signX == 0)
-							signX = 1;
+				short signX = (short) Math.signum(l.y0 - l.y1);
+				if (signX == 0)
+					signX = 1;
 
-						double sY = -signX*((l.y1 - l.y0) / l0);
-						double sX = signX*((l.x1 - l.x0) / l0);
+				double sY = -signX*((l.y1 - l.y0) / l0);
+				double sX = signX*((l.x1 - l.x0) / l0);
 
-						closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
-						reflectionV(sY,sX);
-					}
+				closestpointonline(l.x0,l.y0,l.x1,l.y1,posX + size,posY + size * 2);
+				reflectionV(sY,sX);
+			}
 
 		}
 	}
-	
+
 	private boolean inRange(double x, double y, double range) 
 	{
 		double dX = Math.pow(((x) - (posX + size)), 2);
@@ -139,7 +137,7 @@ public class Sphere {
 		{ 
 			double cx = (double)((A1*C1 - B1*C2)/det); 
 			double cy = (double)((A1*C2 - -B1*C1)/det); 
-			
+
 			if (inRange(cx, cy, size) && posY > cy)
 			{
 				if (A1 == 0 || B1 == 0)
@@ -177,15 +175,16 @@ public class Sphere {
 		velY -= y * (1 / mass);
 	}
 
+	// We check if the ball is outside the bounds
 	private void checkBounds()
 	{
 		if (posX < 0)
-			posX = 0;
+			posX = 2;
 		if (posX + size * 2 > WIDTH)
-			posX = WIDTH - size * 2;
+			posX = WIDTH - 2 - size * 2;
 		if (posY < 0)
-			posY = 0;
+			posY = 2;
 		if (posY + size * 2 > HEIGHT)
-			posY = HEIGHT - size * 2;
+			posY = HEIGHT - 2 - size * 2;
 	}
 }
