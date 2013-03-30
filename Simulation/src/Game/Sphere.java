@@ -100,7 +100,7 @@ public class Sphere {
 					posY + size * 2 >= Math.min(l.y0,l.y1) &&
 					posY <= Math.max(l.y0,l.y1);
 			// We check if we're near the end-points
-			boolean atStart = false;//inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
+			boolean atStart = inRange(l.x0, l.y0, size) ||  inRange(l.x1, l.y1, size);
 					if (l.isBound || inMiddle || atStart) {
 
 						double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
@@ -121,8 +121,8 @@ public class Sphere {
 	
 	private boolean inRange(double x, double y, double range) 
 	{
-		double dX = Math.pow(((x + size) - (posX + size)), 2);
-		double dY = Math.pow(((y + size) - (posY + size)), 2);
+		double dX = Math.pow(((x) - (posX + size)), 2);
+		double dY = Math.pow(((y) - (posY + size)), 2);
 		// We don't root square because it's a very slow operation 
 		// We'd rather square the other side of the (in)equation
 		return (dX + dY <= Math.pow(range, 2));
