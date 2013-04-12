@@ -65,7 +65,7 @@ public class Main extends BasicGame {
 				fluids = new FluidsHandler(gc, new_scale);
 			}
 		}
-
+		// speed
 		if (ip.isKeyPressed(Input.KEY_UP)) {
 			if (bt < 2)
 				bt += 0.1f;
@@ -79,9 +79,13 @@ public class Main extends BasicGame {
 				bt = 1.0f;
 		}
 
+		// gravitation
+		if (ip.isKeyPressed(Input.KEY_G))
+			particules.gravityChanger();
+			
 		// Press tab to restart
 		if (ip.isKeyPressed(Input.KEY_TAB)) {
-			bt = 1.0f;
+			// bt = 1.0f;
 			particules.reset();
 			fluids.clear();	
 		}

@@ -13,8 +13,9 @@ public class ParticulesHandler
 	private int selected;
 	private float tempX0;
 	private float tempY0;
-	int w,h;
-
+	private int w,h;
+	private boolean gravity;
+	
 	public ParticulesHandler(int w, int h) {
 		this.spheres = new LinkedList<Sphere>();
 		this.lines = new LinkedList<Line>();
@@ -26,6 +27,8 @@ public class ParticulesHandler
 		selected = -1;
 		this.tempX0 = -1;
 		this.tempY0 = -1;
+		
+		this.gravity = true;
 	}
 
 
@@ -177,7 +180,7 @@ public class ParticulesHandler
 					}
 				}
 
-				Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture);
+				Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture, gravity);
 				this.spheres.add(p);
 			}
 			else {
@@ -211,5 +214,10 @@ public class ParticulesHandler
 		genBoundaries();
 	}
 	// ==============================
-
+	public void gravityChanger()
+	{
+		gravity = !gravity;
+		for (int i = 0; i < spheres.size(); i++)
+			spheres.get(i).gravityChanger();
+	}
 }
