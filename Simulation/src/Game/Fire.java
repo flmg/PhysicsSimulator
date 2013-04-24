@@ -6,11 +6,9 @@ import Game.Fluid;
 public class Fire extends Fluid {
 
 	public int[][] life;
-	private int w, h;
 
 	public Fire(int wi, int he) {
-		w = wi;
-		h = he;
+		super(wi, he);
 		life = new int[w + 2][h + 2];
 		for (int i = 0; i <= w + 1; i++) {
 			for (int j = 0; j <= h + 1; j++)
@@ -22,19 +20,19 @@ public class Fire extends Fluid {
 		if (Math.random() < 0.5) {
 			if (new_cells[i][j] == AIR) {
 				new_cells[i][j] = FIRE;
-				life[i][j] = 15;
+				life[i][j] = 60;
 			}
 		}
 		if (Math.random() < 0.5) {
 			if (randomBoolean()) {
 				if (new_cells[i - 1][j + 1] == AIR) { // down left
 					new_cells[i - 1][j + 1] = FIRE;
-					life[i - 1][j + 1] = 10;
+					life[i - 1][j + 1] = 50;
 				}
 			} else {
 				if (new_cells[i + 1][j + 1] == AIR) { // down right
 					new_cells[i + 1][j + 1] = FIRE;
-					life[i + 1][j + 1] = 10;
+					life[i + 1][j + 1] = 50;
 				}
 			}
 		}
@@ -78,24 +76,34 @@ public class Fire extends Fluid {
 		if (getLife(i, j) <= 0)
 			clearCell(i, j, new_cells);
 		else {
-			if(new_cells[i-1][j] == OIL){
-				new_cells[i-1][j] = FIRE;
-				life[i-1][j] = 10;
+			if (Math.random() < 0.25f) { // fire spread
+				if (new_cells[i - 1][j] == OIL) { // left
+					new_cells[i - 1][j] = FIRE;
+					life[i - 1][j] = 70;
+				}
+				if (new_cells[i + 1][j] == OIL) { // right
+					new_cells[i + 1][j] = FIRE;
+					life[i + 1][j] = 70;
+				}
+				if (new_cells[i][j - 1] == OIL) { // up
+					new_cells[i][j - 1] = FIRE;
+					life[i][j - 1] = 70;
+				}
+				if (new_cells[i][j + 1] == OIL) { // down
+					new_cells[i][j + 1] = FIRE;
+					life[i][j + 1] = 70;
+				}
+				if (new_cells[i - 1][j + 1] == OIL) { // down left
+					new_cells[i - 1][j + 1] = FIRE;
+					life[i - 1][j + 1] = 70;
+				}
+				if (new_cells[i + 1][j + 1] == OIL) { // down right
+					new_cells[i + 1][j + 1] = FIRE;
+					life[i + 1][j + 1] = 70;
+				}
+				if (j > 1)
+					swap(i, j, i, j - 1, cells, new_cells);
 			}
-			if(new_cells[i+1][j] == OIL){
-				new_cells[i+1][j] = FIRE;
-				life[i+1][j] = 10;
-			}
-			if(new_cells[i-1][j+1] == OIL){
-				new_cells[i-1][j+1] = FIRE;
-				life[i-1][j+1] = 10;
-			}
-			if(new_cells[i+1][j+1] == OIL){
-				new_cells[i+1][j+1] = FIRE;
-				life[i+1][j+1] = 10;
-			}
-			if (j > 1)
-				swap(i, j, i, j - 1, cells, new_cells);
 		}
 	}
 }

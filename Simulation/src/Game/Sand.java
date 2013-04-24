@@ -6,11 +6,12 @@ import Game.Fluid;
 
 public class Sand extends Fluid {
 
-	public Sand() {
-		super();
+	public Sand(int wi, int he) {
+		super(wi, he);
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] cells, int[][] new_cells) {
+	public boolean swap(int i, int j, int x, int y, int[][] cells,
+			int[][] new_cells) {
 		if (new_cells[x][y] == AIR) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -24,13 +25,13 @@ public class Sand extends Fluid {
 		}
 		return false;
 	}
-	
-	public void add(int i, int j, int[][] new_cells) {
-		if (Math.random() < 0.5) {
-			if (new_cells[i][j] == AIR)
+
+	public void emit(int i, int j, int[][] new_cells) {
+		if (Math.random() < 0.25) {
+			if (new_cells[i][j] == AIR) // center
 				new_cells[i][j] = SAND;
 		}
-		if (Math.random() < 0.5) {
+		if (Math.random() < 0.25) {
 			if (randomBoolean()) {
 				if (new_cells[i - 1][j + 1] == AIR) // down left
 					new_cells[i - 1][j + 1] = SAND;
@@ -39,8 +40,38 @@ public class Sand extends Fluid {
 					new_cells[i + 1][j + 1] = SAND;
 			}
 		}
+		if (Math.random() < 0.25) {
+			if (randomBoolean()) {
+				if (new_cells[i - 1][j - 1] == AIR) // up left
+					new_cells[i - 1][j - 1] = SAND;
+			} else {
+				if (new_cells[i + 1][j - 1] == AIR) // up right
+					new_cells[i + 1][j - 1] = SAND;
+			}
+		}
+		if (j - 2 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i][j - 2] == AIR) // up up
+				new_cells[i][j - 2] = SAND;
+		}
+		if (i - 2 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i - 2][j] == AIR) // left left
+				new_cells[i - 2][j] = SAND;
+		}
+		if (i + 2 <= w && Math.random() < 0.25) {
+			if (new_cells[i + 2][j] == AIR) // right right
+				new_cells[i + 2][j] = SAND;
+		}
+
+		if (i - 3 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i - 3][j + 1] == AIR) // down left left left
+				new_cells[i - 3][j + 1] = SAND;
+		}
+		if (i + 3 <= w && Math.random() < 0.25) {
+			if (new_cells[i + 3][j + 1] == AIR) // down right right right
+				new_cells[i + 3][j + 1] = SAND;
+		}
 	}
-	
+
 	public void update(int x, int y, int[][] cells, int[][] new_cells)
 			throws SlickException {
 		// Down

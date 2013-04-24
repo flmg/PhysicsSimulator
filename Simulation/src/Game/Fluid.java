@@ -12,7 +12,12 @@ public class Fluid {
 	final int FIRE = 6;
 	final int OIL = 7;
 
-	public Fluid() {
+	
+	public int w, h;
+	
+	public Fluid(int wi, int he) {
+		this.w = wi;
+		this.h = he;
 	}
 
 	public boolean randomBoolean(){

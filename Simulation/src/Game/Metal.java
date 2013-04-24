@@ -6,11 +6,9 @@ import Game.Fluid;
 public class Metal extends Fluid {
 
 	public int[][] life;
-	private int w, h;
 
 	public Metal(int wi, int he) {
-		w = wi;
-		h = he;
+		super(wi, he);
 		life = new int[w + 2][h + 2];
 		for (int i = 0; i <= w + 1; i++) {
 			for (int j = 0; j <= h + 1; j++)

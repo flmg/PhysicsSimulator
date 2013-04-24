@@ -5,13 +5,13 @@ import Game.Fluid;
 
 public class Oil extends Fluid {
 
-	public Oil() {
-		super();
+	public Oil(int wi, int he) {
+		super(wi, he);
 	}
 
-	public void add(int i, int j, int[][] new_cells) {
+	public void emit(int i, int j, int[][] new_cells) {
 		if (Math.random() < 0.25) {
-			if (new_cells[i][j] == AIR)
+			if (new_cells[i][j] == AIR) // center
 				new_cells[i][j] = OIL;
 		}
 		if (Math.random() < 0.25) {
@@ -22,6 +22,36 @@ public class Oil extends Fluid {
 				if (new_cells[i + 1][j + 1] == AIR) // down right
 					new_cells[i + 1][j + 1] = OIL;
 			}
+		}
+		if (Math.random() < 0.25) {
+			if (randomBoolean()) {
+				if (new_cells[i - 1][j - 1] == AIR) // up left
+					new_cells[i - 1][j - 1] = OIL;
+			} else {
+				if (new_cells[i + 1][j - 1] == AIR) // up right
+					new_cells[i + 1][j - 1] = OIL;
+			}
+		}
+		if (j - 2 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i][j - 2] == AIR) // up up
+				new_cells[i][j - 2] = OIL;
+		}
+		if (i - 2 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i - 2][j] == AIR) // left left
+				new_cells[i - 2][j] = OIL;
+		}
+		if (i + 2 <= w && Math.random() < 0.25) {
+			if (new_cells[i + 2][j] == AIR) // right right
+				new_cells[i + 2][j] = OIL;
+		}
+
+		if (i - 3 >= 1 && Math.random() < 0.25) {
+			if (new_cells[i - 3][j + 1] == AIR) // down left left left
+				new_cells[i - 3][j + 1] = OIL;
+		}
+		if (i + 3 <= w && Math.random() < 0.25) {
+			if (new_cells[i + 3][j + 1] == AIR) // down right right right
+				new_cells[i + 3][j + 1] = OIL;
 		}
 	}
 
@@ -47,21 +77,34 @@ public class Oil extends Fluid {
 
 	public void update(int x, int y, int[][] cells, int[][] new_cells)
 			throws SlickException {
-		// Down
-		if (swap(x, y, x, y + 1, cells, new_cells))
-			return;
-		// Down right/down left
-		if (this.randomBoolean()) {
-			// right first
-			if (swap(x, y, x + 1, y + 1, cells, new_cells))
+		// some randomness in direction
+		if (Math.random() < 0.01f) {
+			// Down right/down left
+			if (randomBoolean()) {
+				if (swap(x, y, x + 1, y + 1, cells, new_cells))
+					return;
+			} else {
+				if (swap(x, y, x - 1, y + 1, cells, new_cells))
+					return;
+			}
+			// Down
+			if (swap(x, y, x, y + 1, cells, new_cells))
 				return;
 		} else {
-			// left first
-			if (swap(x, y, x - 1, y + 1, cells, new_cells))
+			// Down
+			if (swap(x, y, x, y + 1, cells, new_cells))
 				return;
+			// Down right/down left
+			if (randomBoolean()) {
+				if (swap(x, y, x + 1, y + 1, cells, new_cells))
+					return;
+			} else {
+				if (swap(x, y, x - 1, y + 1, cells, new_cells))
+					return;
+			}
 		}
 		// left/right
-		if (this.randomBoolean()) {
+		if (randomBoolean()) {
 			if (swap(x, y, x + 1, y, cells, new_cells))
 				return;
 		} else {

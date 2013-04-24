@@ -23,7 +23,7 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		this.fluids = new FluidsHandler(gc, 4);
+		this.fluids = new FluidsHandler(gc, 2);
 		bt = 1.0f;
 	}
 
@@ -44,7 +44,7 @@ public class Main extends BasicGame {
 		}
 		// right click (add particle)
 		if (ip.isMouseButtonDown(1)) {
-			fluids.addParticule(mouseX / fluids.scale, mouseY / fluids.scale,
+			fluids.emitParticles(mouseX / fluids.scale, mouseY / fluids.scale,
 					fluids.particuleType);
 		}
 		// mode selection

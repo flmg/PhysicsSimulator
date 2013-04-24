@@ -47,9 +47,9 @@ public class FluidsHandler {
 		h = gc.getHeight() / scale;
 		cells = new int[w + 2][h + 2];
 		new_cells = new int[w + 2][h + 2];
-		water = new Water();
-		oil = new Oil();
-		sand = new Sand();
+		water = new Water(w, h);
+		oil = new Oil(w, h);
+		sand = new Sand(w, h);
 		metal = new Metal(w, h);
 		fire = new Fire(w, h);
 		particuleType = type.Water;
@@ -148,7 +148,7 @@ public class FluidsHandler {
 		}
 		if (isRaining)
 			rain();
-		// update
+		// update map
 		for (int y = h; y >= 1; y--) {
 			for (int x = 1; x <= w; x++) {
 				cells[x][y] = new_cells[x][y];
@@ -166,8 +166,8 @@ public class FluidsHandler {
 
 	public void rain() {
 		for (int i = 1; i <= w; i++) {
-			if (Math.random() < 0.005)
-				addParticule(i, 1, type.Water);
+			if (Math.random() < 0.003)
+				water.addParticle(i, 1, new_cells);
 		}
 	}
 
@@ -180,22 +180,21 @@ public class FluidsHandler {
 			return x;
 	}
 
-	public void addParticule(int i, int j, type particule) {
+	public void emitParticles(int i, int j, type particule) {
 		// Ignore borders
 		i++;
 		j++;
 		i = constrain(i, 1, w);
 		j = constrain(j, 1, h);
-
 		switch (particule) {
 		case Water:
-			water.add(i, j, new_cells);
+			water.emit(i, j, new_cells);
 			break;
 		case Oil:
-			oil.add(i, j, new_cells);
+			oil.emit(i, j, new_cells);
 			break;
 		case Sand:
-			sand.add(i, j, new_cells);
+			sand.emit(i, j, new_cells);
 			break;
 		case Fire:
 			fire.add(i, j, new_cells);
