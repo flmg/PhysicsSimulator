@@ -5,91 +5,49 @@ import Game.Fluid;
 
 public class Water extends Fluid {
 
-	public Water(float MaxM, float MaxC, float MinM, float MaxS, float MinF) {
-		super(MaxM, MaxC, MinM, MaxS, MinF);
+	public Water() {
+		super();
 	}
 
-	public void update(int x, int y, int[][] cells, float[][] mass,
-			float[][] new_mass) throws SlickException {
-
-		float Flow = 0;
-		float remaining_mass;
-
-		// Custom push-only flow
-		Flow = 0;
-		remaining_mass = mass[x][y];
-		if (remaining_mass <= 0)
-			return;
-
-		// The block below this one
-		if ((cells[x][y + 1] != BLOCK)) {
-			Flow = get_stable_state_b(remaining_mass + mass[x][y + 1])
-					- mass[x][y + 1];
-
-			if (Flow > MinFlow)
-				Flow *= 0.5; // leads to smoother flow
-
-			Flow = constrain(Flow, 0, Math.min(MaxSpeed, remaining_mass));
-
-			new_mass[x][y] -= Flow;
-			new_mass[x][y + 1] += Flow;
-			remaining_mass -= Flow;
+	public boolean swap(int i, int j, int x, int y, int[][] cells, int[][] new_cells) {
+		if (new_cells[x][y] == AIR) {
+			int temp = new_cells[i][j];
+			new_cells[i][j] = new_cells[x][y];
+			new_cells[x][y] = temp;
+			return true;
 		}
-
-		if (remaining_mass <= 0)
-			return;
-
-		// Left
-		if (cells[x - 1][y] != BLOCK) {
-			// Equalize the amount of water in this block and it's
-			// neighbour
-			Flow = (mass[x][y] - mass[x - 1][y]) / 4;
-
-			if (Flow > MinFlow)
-				Flow *= 0.5;
-
-			Flow = constrain(Flow, 0, remaining_mass);
-
-			new_mass[x][y] -= Flow;
-			new_mass[x - 1][y] += Flow;
-			remaining_mass -= Flow;
+		if (new_cells[x][y] == SAND) {
+			new_cells[i][j] = AIR;
+			new_cells[x][y] = WETSAND;
+			return true;
 		}
-
-		if (remaining_mass <= 0)
-			return;
-
-		// Right
-		if (cells[x + 1][y] != BLOCK) {
-			// Equalize the amount of water in this block and it's
-			// neighbour
-			Flow = (mass[x][y] - mass[x + 1][y]) / 4;
-
-			if (Flow > MinFlow)
-				Flow *= 0.5;
-
-			Flow = constrain(Flow, 0, remaining_mass);
-
-			new_mass[x][y] -= Flow;
-			new_mass[x + 1][y] += Flow;
-			remaining_mass -= Flow;
+		if (new_cells[x][y] == WETSAND) {
+			return false;
 		}
-
-		if (remaining_mass <= 0)
+		return false;
+	}
+	public void update(int x, int y, int[][] cells, int[][] new_cells)
+			throws SlickException {
+		// Down
+		if (swap(x, y, x, y + 1, cells, new_cells))
 			return;
-
-		// Up. Only compressed water flows upwards.
-		if (cells[x][y - 1] != BLOCK) {
-			Flow = remaining_mass
-					- get_stable_state_b(remaining_mass + mass[x][y - 1]);
-
-			if (Flow > MinFlow)
-				Flow *= 0.5;
-
-			Flow = constrain(Flow, 0, Math.min(MaxSpeed, remaining_mass));
-
-			new_mass[x][y] -= Flow;
-			new_mass[x][y - 1] += Flow;
-			remaining_mass -= Flow;
+		// Down right/down left
+		if (this.randomBoolean()) {
+			// right first
+			if (swap(x, y, x + 1, y + 1, cells, new_cells))
+				return;
+		} else {
+			// left first
+			if (swap(x, y, x - 1, y + 1, cells, new_cells))
+				return;
+		}
+		// left/right
+		if (this.randomBoolean()) {
+			if (swap(x, y, x + 1, y, cells, new_cells))
+				return;
+		} else {
+			if (swap(x, y, x - 1, y, cells, new_cells))
+				return;
 		}
 	}
 }

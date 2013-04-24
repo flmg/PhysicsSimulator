@@ -25,7 +25,7 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		this.fluids = new FluidsHandler(gc, 2);
+		this.fluids = new FluidsHandler(gc, 8);
 		bt = 1.0f;
 	}
 
@@ -42,26 +42,30 @@ public class Main extends BasicGame {
 			if (ip.isKeyDown(Input.KEY_LCONTROL))
 				particules.addLine(mouseX, mouseY);
 			else
-				particules.addSphere(mouseX, mouseY, 1024, 500,	texture);
+				particules.addSphere(mouseX, mouseY, 1024, 500, texture);
 		}
 		// Mouse right clicked (add particule)
 		if (ip.isMouseButtonDown(1)) {
-			fluids.addParticule(mouseX/fluids.scale, mouseY/fluids.scale);
+			fluids.addParticule(mouseX / fluids.scale, mouseY / fluids.scale, fluids.particuleType);
 		}
 		// mode selection
 		if (ip.isKeyPressed(Input.KEY_M)) {
 			fluids.changeParticules();
 		}
+		// rain
+		if (ip.isKeyPressed(Input.KEY_R)) {
+			fluids.makeRain();
+		}
 		// scale selection
 		if (ip.isKeyPressed(Input.KEY_SUBTRACT)) {
-			if(fluids.scale >= 2) {
-				int new_scale = fluids.scale / 2;						
+			if (fluids.scale >= 2) {
+				int new_scale = fluids.scale / 2;
 				fluids = new FluidsHandler(gc, new_scale);
 			}
 		}
 		if (ip.isKeyPressed(Input.KEY_ADD)) {
-			if(fluids.scale <= 4) {
-				int new_scale = fluids.scale * 2;						
+			if (fluids.scale <= 4) {
+				int new_scale = fluids.scale * 2;
 				fluids = new FluidsHandler(gc, new_scale);
 			}
 		}
@@ -82,12 +86,12 @@ public class Main extends BasicGame {
 		// gravitation
 		if (ip.isKeyPressed(Input.KEY_G))
 			particules.gravityChanger();
-			
+
 		// Press tab to restart
 		if (ip.isKeyPressed(Input.KEY_TAB)) {
 			// bt = 1.0f;
 			particules.reset();
-			fluids.clear();	
+			fluids.clear();
 		}
 
 		// Press ESC to quit
@@ -102,16 +106,16 @@ public class Main extends BasicGame {
 		fluids.render(g);
 		g.setColor(Color.white);
 		g.drawString(
-				String.format("%d balls (TAB to reset session)",
-						particules.count()), 10, 35);
-		g.drawString(
-				String.format("Click to create balls ; Ctrl+Click to draw a line",
-						particules.count()), 10, 60);
-		g.drawString(String.format("Speed : %.2f", bt), 10, 85);
-		g.drawString("Particule Type : " + fluids.particuleType.toString()
-				+ " (Press M to switch)", 10, 110);
-		g.drawString("scale : " + fluids.scale
-				+ " (Press + and - to change)", 10, 135);
+				String.format("%d ball(s) (TAB to reset)", particules.count()),
+				10, 35);
+		g.drawString(String.format(
+				"Click (balls) ; Ctrl+Click (line)",
+				particules.count()), 10, 60);
+		g.drawString(String.format("Speed: %.2f", bt), 10, 85);
+		g.drawString("Particule: " + fluids.particuleType.toString()
+				+ " (M to switch)", 10, 110);
+		g.drawString("Scale: " + fluids.scale + " (+ / -)", 10, 135);
+		g.drawString("R (rain)", 10, 160);
 	}
 
 	public static void main(String[] args) throws SlickException {
