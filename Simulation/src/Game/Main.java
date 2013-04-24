@@ -4,6 +4,8 @@ import Game.ParticulesHandler;
 import Game.FluidsHandler;
 import org.newdawn.slick.*;
 
+import java.awt.Font;
+
 public class Main extends BasicGame {
 
 	private Image texture;
@@ -11,6 +13,7 @@ public class Main extends BasicGame {
 	private double bt;
 	private FluidsHandler fluids;
 	private int mouseX, mouseY;
+	TrueTypeFont font;
 
 	public Main() {
 		super("Physics Simulation");
@@ -25,6 +28,10 @@ public class Main extends BasicGame {
 		}
 		this.fluids = new FluidsHandler(gc, 2);
 		bt = 1.0f;
+
+		// load a default java font
+		Font awtFont = new Font("Arial", Font.TRUETYPE_FONT, 18);
+		font = new TrueTypeFont(awtFont, true);
 	}
 
 	@Override
@@ -33,39 +40,42 @@ public class Main extends BasicGame {
 		mouseX = ip.getMouseX();
 		mouseY = ip.getMouseY();
 		particules.update(bt * (double) delta / 1000f, mouseX, mouseY);
-		fluids.update();
-
-		// Mouse left clicked
-		if (ip.isMousePressed(0)) {
-			if (ip.isKeyDown(Input.KEY_LCONTROL))
-				particules.addLine(mouseX, mouseY);
-			else
-				particules.addSphere(mouseX, mouseY, 1024, 500, texture);
-		}
-		// right click (add particle)
-		if (ip.isMouseButtonDown(1)) {
-			fluids.emitParticles(mouseX / fluids.scale, mouseY / fluids.scale,
-					fluids.particuleType);
-		}
-		// mode selection
-		if (ip.isKeyPressed(Input.KEY_M)) {
-			fluids.changeParticules();
-		}
-		// rain
-		if (ip.isKeyPressed(Input.KEY_R)) {
-			fluids.makeRain();
-		}
-		// scale selection
-		if (ip.isKeyPressed(Input.KEY_SUBTRACT)) {
-			if (fluids.scale >= 2) {
-				int new_scale = fluids.scale / 2;
-				fluids = new FluidsHandler(gc, new_scale);
+		
+		// if unpaused
+		if (bt > 0) {
+			fluids.update();
+			// Mouse left clicked
+			if (ip.isMousePressed(0)) {
+				if (ip.isKeyDown(Input.KEY_LCONTROL))
+					particules.addLine(mouseX, mouseY);
+				else
+					particules.addSphere(mouseX, mouseY, 1024, 500, texture);
 			}
-		}
-		if (ip.isKeyPressed(Input.KEY_ADD)) {
-			if (fluids.scale <= 4) {
-				int new_scale = fluids.scale * 2;
-				fluids = new FluidsHandler(gc, new_scale);
+			// right click (add particle)
+			if (ip.isMouseButtonDown(1)) {
+				fluids.emitParticles(mouseX / fluids.scale, mouseY
+						/ fluids.scale, fluids.particuleType);
+			}
+			// mode selection
+			if (ip.isKeyPressed(Input.KEY_M)) {
+				fluids.changeParticules();
+			}
+			// rain
+			if (ip.isKeyPressed(Input.KEY_R)) {
+				fluids.makeRain();
+			}
+			// scale selection
+			if (ip.isKeyPressed(Input.KEY_SUBTRACT)) {
+				if (fluids.scale >= 2) {
+					int new_scale = fluids.scale / 2;
+					fluids = new FluidsHandler(gc, new_scale);
+				}
+			}
+			if (ip.isKeyPressed(Input.KEY_ADD)) {
+				if (fluids.scale <= 4) {
+					int new_scale = fluids.scale * 2;
+					fluids = new FluidsHandler(gc, new_scale);
+				}
 			}
 		}
 		// speed
@@ -111,10 +121,56 @@ public class Main extends BasicGame {
 				String.format("Click (balls) ; Ctrl+Click (line)",
 						particules.count()), 10, 60);
 		g.drawString(String.format("Speed: %.2f", bt), 10, 85);
-		g.drawString("Particule: " + fluids.particuleType.toString()
-				+ " (M to switch)", 10, 110);
+		g.drawString("M to switch particle, R to make rain", 10, 110);
 		g.drawString("Scale: " + fluids.scale + " (+ / -)", 10, 135);
-		g.drawString("R (rain)", 10, 160);
+
+		// materials
+		Color col = new Color(0.3f, 0.3f, 0.3f, 1f);
+		g.setColor(col);
+		g.fillRect(0, 190, 100, 190);
+		col = new Color(0.1f, 0.1f, 0.1f, 1f);
+		g.setColor(col);
+		g.fillRect(2, 192, 96, 186);
+
+		col = new Color(0.5f, 0.5f, 0.5f, 0.7f);
+		g.setColor(col);
+		int offset = fluids.particuleType.ordinal();
+		// System.out.print(offset+"\n");
+		g.fillRect(5, 200 + 25 * offset, 90, 20);
+
+		font.drawString(10, 200, "Water");
+		font.drawString(10, 225, "Oil");
+		font.drawString(10, 250, "Block");
+		font.drawString(10, 275, "Sand");
+		font.drawString(10, 300, "Metal");
+		font.drawString(10, 325, "Fire");
+		font.drawString(10, 350, "Eraser");
+
+		g.setColor(Color.blue);
+		g.fillRect(72, 202, 16, 16);
+
+		col = new Color(0.3f, 0.1f, 0.1f, 1f);
+		g.setColor(col);
+		g.fillRect(72, 227, 16, 16);
+
+		col = new Color(0.9f, 0.9f, 0.9f, 1f);
+		g.setColor(col);
+		g.fillRect(72, 252, 16, 16);
+
+		g.setColor(Color.yellow);
+		g.fillRect(72, 277, 16, 16);
+
+		col = new Color(0.5f, 0.5f, 0.5f, 1f);
+		g.setColor(col);
+		g.fillRect(72, 302, 16, 16);
+
+		col = new Color(0.9f, 0f, 0f, 1f);
+		g.setColor(col);
+		g.fillRect(72, 327, 16, 16);
+
+		g.setColor(Color.black);
+		g.flush();
+
 	}
 
 	public static void main(String[] args) throws SlickException {

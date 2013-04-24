@@ -35,7 +35,7 @@ public class FluidsHandler {
 	public Oil oil;
 
 	public enum type {
-		Water, Block, Eraser, Sand, Metal, Fire, Oil
+		Water, Oil, Block, Sand, Metal, Fire, Eraser
 	};
 
 	public type particuleType;

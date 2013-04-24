@@ -87,5 +87,9 @@ public class Sand extends Fluid {
 			if (swap(x, y, x - 1, y + 1, cells, new_cells))
 				return;
 		}
+		/*
+		 * // wet sand case if (new_cells[x][y] == SAND && new_cells[x][y - 1]
+		 * == WETSAND) swap(x, y, x, y - 1, cells, new_cells);
+		 */
 	}
 }
