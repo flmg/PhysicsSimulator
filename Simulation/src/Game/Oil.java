@@ -3,24 +3,24 @@ package Game;
 import org.newdawn.slick.SlickException;
 import Game.Fluid;
 
-public class Water extends Fluid {
+public class Oil extends Fluid {
 
-	public Water() {
+	public Oil() {
 		super();
 	}
 
 	public void add(int i, int j, int[][] new_cells) {
 		if (Math.random() < 0.25) {
 			if (new_cells[i][j] == AIR)
-				new_cells[i][j] = WATER;
+				new_cells[i][j] = OIL;
 		}
 		if (Math.random() < 0.25) {
 			if (randomBoolean()) {
 				if (new_cells[i - 1][j + 1] == AIR) // down left
-					new_cells[i - 1][j + 1] = WATER;
+					new_cells[i - 1][j + 1] = OIL;
 			} else {
 				if (new_cells[i + 1][j + 1] == AIR) // down right
-					new_cells[i + 1][j + 1] = WATER;
+					new_cells[i + 1][j + 1] = OIL;
 			}
 		}
 	}
@@ -34,9 +34,7 @@ public class Water extends Fluid {
 			return true;
 		}
 		if (new_cells[x][y] == SAND) {
-			new_cells[i][j] = AIR;
-			new_cells[x][y] = WETSAND;
-			return true;
+			return false;
 		}
 		if (new_cells[x][y] == WETSAND) {
 			return false;

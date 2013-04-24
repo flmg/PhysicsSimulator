@@ -18,6 +18,8 @@ public class FluidsHandler {
 	final int SAND = 3;
 	final int WETSAND = 4;
 	final int METAL = 5;
+	final int FIRE = 6;
+	final int OIL = 7;
 
 	// Data structures
 	public int[][] cells, new_cells;
@@ -29,9 +31,11 @@ public class FluidsHandler {
 	public Water water;
 	public Sand sand;
 	public Metal metal;
+	public Fire fire;
+	public Oil oil;
 
 	public enum type {
-		Water, Block, Eraser, Sand, Metal
+		Water, Block, Eraser, Sand, Metal, Fire, Oil
 	};
 
 	public type particuleType;
@@ -44,8 +48,10 @@ public class FluidsHandler {
 		cells = new int[w + 2][h + 2];
 		new_cells = new int[w + 2][h + 2];
 		water = new Water();
+		oil = new Oil();
 		sand = new Sand();
 		metal = new Metal(w, h);
+		fire = new Fire(w, h);
 		particuleType = type.Water;
 		clear();
 	}
@@ -98,6 +104,12 @@ public class FluidsHandler {
 					case METAL:
 						metal.update(x, y, cells, new_cells);
 						break;
+					case FIRE:
+						fire.update(x, y, cells, new_cells);
+						break;
+					case OIL:
+						oil.update(x, y, cells, new_cells);
+						break;
 					default:
 						break;
 					}
@@ -122,16 +134,20 @@ public class FluidsHandler {
 					case METAL:
 						metal.update(x, y, cells, new_cells);
 						break;
+					case FIRE:
+						fire.update(x, y, cells, new_cells);
+						break;
+					case OIL:
+						oil.update(x, y, cells, new_cells);
+						break;
 					default:
 						break;
 					}
 				}
 			}
 		}
-
 		if (isRaining)
 			rain();
-
 		// update
 		for (int y = h; y >= 1; y--) {
 			for (int x = 1; x <= w; x++) {
@@ -168,15 +184,21 @@ public class FluidsHandler {
 		// Ignore borders
 		i++;
 		j++;
-		i = constrain(i,1,w);
-		j = constrain(j,1,h);
-		
+		i = constrain(i, 1, w);
+		j = constrain(j, 1, h);
+
 		switch (particule) {
 		case Water:
 			water.add(i, j, new_cells);
 			break;
+		case Oil:
+			oil.add(i, j, new_cells);
+			break;
 		case Sand:
 			sand.add(i, j, new_cells);
+			break;
+		case Fire:
+			fire.add(i, j, new_cells);
 			break;
 		case Eraser:
 			clearCell(i, j);
@@ -227,6 +249,9 @@ public class FluidsHandler {
 	public void changeParticules() {
 		switch (particuleType) {
 		case Water:
+			particuleType = type.Oil;
+			break;
+		case Oil:
 			particuleType = type.Block;
 			break;
 		case Block:
@@ -236,6 +261,9 @@ public class FluidsHandler {
 			particuleType = type.Metal;
 			break;
 		case Metal:
+			particuleType = type.Fire;
+			break;
+		case Fire:
 			particuleType = type.Eraser;
 			break;
 		case Eraser:
@@ -252,6 +280,12 @@ public class FluidsHandler {
 				switch (cells[i][j]) {
 				case WATER:
 					g.setColor(Color.blue);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case OIL:
+					Color b = new Color(0.3f, 0.1f, 0.1f, 1f);
+					g.setColor(b);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
@@ -277,6 +311,12 @@ public class FluidsHandler {
 							0.5f + (0.5f - (metal.getLife(i, j) / 2000f)),
 							0.5f, 0.5f, 1f);
 					g.setColor(e);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case FIRE:
+					Color f = new Color(0.9f, 0f, 0f, 1f);
+					g.setColor(f);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;

@@ -35,7 +35,7 @@ public class Sand extends Fluid {
 				if (new_cells[i - 1][j + 1] == AIR) // down left
 					new_cells[i - 1][j + 1] = SAND;
 			} else {
-				if (new_cells[i - 1][j + 1] == AIR) // down right
+				if (new_cells[i + 1][j + 1] == AIR) // down right
 					new_cells[i + 1][j + 1] = SAND;
 			}
 		}

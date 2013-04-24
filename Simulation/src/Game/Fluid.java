@@ -9,6 +9,8 @@ public class Fluid {
 	final int SAND = 3;
 	final int WETSAND = 4;
 	final int METAL = 5;
+	final int FIRE = 6;
+	final int OIL = 7;
 
 	public Fluid() {
 	}
