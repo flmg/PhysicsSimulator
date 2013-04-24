@@ -8,6 +8,7 @@ public class Fluid {
 	final int WATER = 2;
 	final int SAND = 3;
 	final int WETSAND = 4;
+	final int METAL = 5;
 
 	public Fluid() {
 	}

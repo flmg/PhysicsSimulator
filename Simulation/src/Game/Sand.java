@@ -25,6 +25,22 @@ public class Sand extends Fluid {
 		return false;
 	}
 	
+	public void add(int i, int j, int[][] new_cells) {
+		if (Math.random() < 0.5) {
+			if (new_cells[i][j] == AIR)
+				new_cells[i][j] = SAND;
+		}
+		if (Math.random() < 0.5) {
+			if (randomBoolean()) {
+				if (new_cells[i - 1][j + 1] == AIR) // down left
+					new_cells[i - 1][j + 1] = SAND;
+			} else {
+				if (new_cells[i - 1][j + 1] == AIR) // down right
+					new_cells[i + 1][j + 1] = SAND;
+			}
+		}
+	}
+	
 	public void update(int x, int y, int[][] cells, int[][] new_cells)
 			throws SlickException {
 		// Down

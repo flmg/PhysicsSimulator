@@ -9,7 +9,24 @@ public class Water extends Fluid {
 		super();
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] cells, int[][] new_cells) {
+	public void add(int i, int j, int[][] new_cells) {
+		if (Math.random() < 0.25) {
+			if (new_cells[i][j] == AIR)
+				new_cells[i][j] = WATER;
+		}
+		if (Math.random() < 0.25) {
+			if (randomBoolean()) {
+				if (new_cells[i - 1][j + 1] == AIR) // down left
+					new_cells[i - 1][j + 1] = WATER;
+			} else {
+				if (new_cells[i - 1][j + 1] == AIR) // down right
+					new_cells[i + 1][j + 1] = WATER;
+			}
+		}
+	}
+
+	public boolean swap(int i, int j, int x, int y, int[][] cells,
+			int[][] new_cells) {
 		if (new_cells[x][y] == AIR) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -24,8 +41,12 @@ public class Water extends Fluid {
 		if (new_cells[x][y] == WETSAND) {
 			return false;
 		}
+		if (new_cells[x][y] == METAL) {
+			return false;
+		}
 		return false;
 	}
+
 	public void update(int x, int y, int[][] cells, int[][] new_cells)
 			throws SlickException {
 		// Down

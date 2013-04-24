@@ -1,7 +1,5 @@
 package Game;
 
-// import java.awt.event.KeyEvent; // Unused 
-
 import Game.ParticulesHandler;
 import Game.FluidsHandler;
 import org.newdawn.slick.*;
@@ -25,7 +23,7 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		this.fluids = new FluidsHandler(gc, 8);
+		this.fluids = new FluidsHandler(gc, 4);
 		bt = 1.0f;
 	}
 
@@ -44,9 +42,10 @@ public class Main extends BasicGame {
 			else
 				particules.addSphere(mouseX, mouseY, 1024, 500, texture);
 		}
-		// Mouse right clicked (add particule)
+		// right click (add particle)
 		if (ip.isMouseButtonDown(1)) {
-			fluids.addParticule(mouseX / fluids.scale, mouseY / fluids.scale, fluids.particuleType);
+			fluids.addParticule(mouseX / fluids.scale, mouseY / fluids.scale,
+					fluids.particuleType);
 		}
 		// mode selection
 		if (ip.isKeyPressed(Input.KEY_M)) {
@@ -108,9 +107,9 @@ public class Main extends BasicGame {
 		g.drawString(
 				String.format("%d ball(s) (TAB to reset)", particules.count()),
 				10, 35);
-		g.drawString(String.format(
-				"Click (balls) ; Ctrl+Click (line)",
-				particules.count()), 10, 60);
+		g.drawString(
+				String.format("Click (balls) ; Ctrl+Click (line)",
+						particules.count()), 10, 60);
 		g.drawString(String.format("Speed: %.2f", bt), 10, 85);
 		g.drawString("Particule: " + fluids.particuleType.toString()
 				+ " (M to switch)", 10, 110);

@@ -17,6 +17,7 @@ public class FluidsHandler {
 	final int WATER = 2;
 	final int SAND = 3;
 	final int WETSAND = 4;
+	final int METAL = 5;
 
 	// Data structures
 	public int[][] cells, new_cells;
@@ -25,11 +26,12 @@ public class FluidsHandler {
 	public boolean isRaining;
 
 	// Fluids
-	public Water water = new Water();
-	public Sand sand = new Sand();
+	public Water water;
+	public Sand sand;
+	public Metal metal;
 
 	public enum type {
-		Water, Block, Eraser, Sand
+		Water, Block, Eraser, Sand, Metal
 	};
 
 	public type particuleType;
@@ -41,6 +43,9 @@ public class FluidsHandler {
 		h = gc.getHeight() / scale;
 		cells = new int[w + 2][h + 2];
 		new_cells = new int[w + 2][h + 2];
+		water = new Water();
+		sand = new Sand();
+		metal = new Metal(w, h);
 		particuleType = type.Water;
 		clear();
 	}
@@ -76,33 +81,49 @@ public class FluidsHandler {
 			if (this.randomBoolean()) {
 				// from left to right
 				for (int x = 1; x <= w; x++) {
-					if (cells[x][y] == BLOCK || cells[x][y] == AIR)
-						continue;
-					else {
-						if (cells[x][y] == WATER) {
-							water.update(x, y, cells, new_cells);
-							continue;
-						}
-						if (cells[x][y] == SAND || cells[x][y] == WETSAND) {
-							sand.update(x, y, cells, new_cells);
-							continue;
-						}
+					switch (cells[x][y]) {
+					case AIR:
+						break;
+					case BLOCK:
+						break;
+					case WATER:
+						water.update(x, y, cells, new_cells);
+						break;
+					case SAND:
+						sand.update(x, y, cells, new_cells);
+						break;
+					case WETSAND:
+						sand.update(x, y, cells, new_cells);
+						break;
+					case METAL:
+						metal.update(x, y, cells, new_cells);
+						break;
+					default:
+						break;
 					}
 				}
 			} else {
 				// from right to left
 				for (int x = w; x >= 1; x--) {
-					if (cells[x][y] == BLOCK || cells[x][y] == AIR)
-						continue;
-					else {
-						if (cells[x][y] == WATER) {
-							water.update(x, y, cells, new_cells);
-							continue;
-						}
-						if (cells[x][y] == SAND || cells[x][y] == WETSAND) {
-							sand.update(x, y, cells, new_cells);
-							continue;
-						}
+					switch (cells[x][y]) {
+					case AIR:
+						break;
+					case BLOCK:
+						break;
+					case WATER:
+						water.update(x, y, cells, new_cells);
+						break;
+					case SAND:
+						sand.update(x, y, cells, new_cells);
+						break;
+					case WETSAND:
+						sand.update(x, y, cells, new_cells);
+						break;
+					case METAL:
+						metal.update(x, y, cells, new_cells);
+						break;
+					default:
+						break;
 					}
 				}
 			}
@@ -111,16 +132,12 @@ public class FluidsHandler {
 		if (isRaining)
 			rain();
 
-		int count = 0;
 		// update
 		for (int y = h; y >= 1; y--) {
 			for (int x = 1; x <= w; x++) {
 				cells[x][y] = new_cells[x][y];
-				if (cells[x][y] == WATER)
-					count++;
 			}
 		}
-		//System.out.print("Water cells: " + count + ".\n");
 	}
 
 	public void clearCell(int i, int j) {
@@ -133,25 +150,33 @@ public class FluidsHandler {
 
 	public void rain() {
 		for (int i = 1; i <= w; i++) {
-			if (Math.random() < 0.005) // 1 chance over 100
+			if (Math.random() < 0.005)
 				addParticule(i, 1, type.Water);
 		}
+	}
+
+	public int constrain(int x, int low, int high) {
+		if (x < low)
+			return low;
+		else if (x > high)
+			return high;
+		else
+			return x;
 	}
 
 	public void addParticule(int i, int j, type particule) {
 		// Ignore borders
 		i++;
 		j++;
+		i = constrain(i,1,w);
+		j = constrain(j,1,h);
+		
 		switch (particule) {
 		case Water:
-			if (cells[i][j] == AIR) {
-				new_cells[i][j] = WATER;
-			}
+			water.add(i, j, new_cells);
 			break;
 		case Sand:
-			if (cells[i][j] == AIR) {
-				new_cells[i][j] = SAND;
-			}
+			sand.add(i, j, new_cells);
 			break;
 		case Eraser:
 			clearCell(i, j);
@@ -191,6 +216,9 @@ public class FluidsHandler {
 			if (i + 1 <= w && j + 1 <= h) // down right
 				new_cells[i + 1][j + 1] = BLOCK;
 			break;
+		case Metal:
+			metal.add(i, j, new_cells);
+			break;
 		default:
 			break;
 		}
@@ -205,6 +233,9 @@ public class FluidsHandler {
 			particuleType = type.Sand;
 			break;
 		case Sand:
+			particuleType = type.Metal;
+			break;
+		case Metal:
 			particuleType = type.Eraser;
 			break;
 		case Eraser:
@@ -225,7 +256,8 @@ public class FluidsHandler {
 					g.flush();
 					break;
 				case BLOCK:
-					g.setColor(Color.gray);
+					Color c = new Color(0.9f, 0.9f, 0.9f, 1f);
+					g.setColor(c);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
@@ -235,8 +267,16 @@ public class FluidsHandler {
 					g.flush();
 					break;
 				case WETSAND:
-					Color c = new Color(0.3f, 0.3f, 0f, 1f);
-					g.setColor(c);
+					Color d = new Color(0.3f, 0.3f, 0f, 1f);
+					g.setColor(d);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case METAL:
+					Color e = new Color(
+							0.5f + (0.5f - (metal.getLife(i, j) / 2000f)),
+							0.5f, 0.5f, 1f);
+					g.setColor(e);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
