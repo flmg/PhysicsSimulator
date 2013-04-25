@@ -5,18 +5,11 @@ import Game.Fluid;
 
 public class Fire extends Fluid {
 
-	public int[][] life;
-
 	public Fire(int wi, int he) {
 		super(wi, he);
-		life = new int[w + 2][h + 2];
-		for (int i = 0; i <= w + 1; i++) {
-			for (int j = 0; j <= h + 1; j++)
-				life[i][j] = 0;
-		}
 	}
 
-	public void add(int i, int j, int[][] new_cells) {
+	public void add(int i, int j, int[][] new_cells, int[][] life) {
 		if (Math.random() < 0.5) {
 			if (new_cells[i][j] == AIR) {
 				new_cells[i][j] = FIRE;
@@ -38,16 +31,16 @@ public class Fire extends Fluid {
 		}
 	}
 
-	public int getLife(int i, int j) {
+	public int getLife(int i, int j, int[][] life) {
 		return life[i][j];
 	}
 
-	public void clearCell(int i, int j, int[][] new_cells) {
+	public void clearCell(int i, int j, int[][] new_cells, int[][] life) {
 		new_cells[i][j] = AIR;
 		life[i][j] = 0;
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] new_cells) {
+	public boolean swap(int i, int j, int x, int y, int[][] new_cells, int[][] life) {
 		if (new_cells[x][y] == AIR) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -58,7 +51,7 @@ public class Fire extends Fluid {
 			return true;
 		}
 		if (new_cells[x][y] == ICE) {
-			clearCell(i, j, new_cells);
+			clearCell(i, j, new_cells, life);
 			new_cells[x][y] = WATER;
 			return false;
 		}
@@ -71,10 +64,10 @@ public class Fire extends Fluid {
 		return false;
 	}
 
-	public void update(int i, int j, int[][] new_cells) throws SlickException {
+	public void update(int i, int j, int[][] new_cells, int[][] life) throws SlickException {
 		life[i][j]--;
-		if (getLife(i, j) <= 0)
-			clearCell(i, j, new_cells);
+		if (getLife(i, j, life) <= 0)
+			clearCell(i, j, new_cells, life);
 		else {
 			if (Math.random() < 0.25f) { // fire spread
 				if (new_cells[i - 1][j] == OIL) { // left
@@ -102,7 +95,7 @@ public class Fire extends Fluid {
 					life[i + 1][j + 1] = 70;
 				}
 				if (j - 1 >= 1)
-					swap(i, j, i, j - 1, new_cells);
+					swap(i, j, i, j - 1, new_cells, life);
 			}
 		}
 	}

@@ -99,7 +99,7 @@ public class Main extends BasicGame {
 		if (ip.isKeyPressed(Input.KEY_TAB)) {
 			// bt = 1.0f;
 			particules.reset();
-			fluids.clear();
+			fluids.clearMap();
 		}
 		// Press ESC to quit
 		if (ip.isKeyPressed(Input.KEY_ESCAPE)) {

@@ -21,9 +21,10 @@ public class FluidsHandler {
 	final int FIRE = 6;
 	final int OIL = 7;
 	final int ICE = 8;
+	final int LAVA = 9;
 
-	// Data structures
-	public int[][] cells, new_cells;
+	// map
+	public int[][] cells, new_cells, life;
 
 	// Climate
 	public boolean isRaining;
@@ -35,9 +36,10 @@ public class FluidsHandler {
 	public Fire fire;
 	public Oil oil;
 	public Ice ice;
+	public Lava lava;
 
 	public enum type {
-		Water, Oil, Block, Sand, Metal, Fire, Ice, Eraser
+		Water, Oil, Block, Sand, Metal, Fire, Ice, Lava, Eraser
 	};
 
 	public type particuleType;
@@ -49,17 +51,20 @@ public class FluidsHandler {
 		h = gc.getHeight() / scale;
 		cells = new int[w + 2][h + 2];
 		new_cells = new int[w + 2][h + 2];
+		life = new int[w + 2][h + 2];
 		water = new Water(w, h);
 		oil = new Oil(w, h);
 		sand = new Sand(w, h);
 		metal = new Metal(w, h);
 		fire = new Fire(w, h);
 		ice = new Ice(w, h);
+		lava = new Lava(w, h);
 		particuleType = type.Water;
-		clear();
+		clearMap();
 	}
 
-	public void clear() {
+	public void clearMap() {
+		// clear map
 		for (int j = 1; j <= h; j++) {
 			for (int i = 1; i <= w; i++) {
 				new_cells[i][j] = AIR;
@@ -77,6 +82,11 @@ public class FluidsHandler {
 			for (int j = 0; j <= h + 1; j++) {
 				cells[i][j] = new_cells[i][j];
 			}
+		}
+		// clear life
+		for (int i = 0; i <= w + 1; i++) {
+			for (int j = 0; j <= h + 1; j++)
+				life[i][j] = 0;
 		}
 	}
 
@@ -98,22 +108,25 @@ public class FluidsHandler {
 					case ICE:
 						break;
 					case WATER:
-						water.update(x, y, new_cells);
+						water.update(x, y, new_cells, life);
 						break;
 					case SAND:
-						sand.update(x, y, new_cells);
+						sand.update(x, y, new_cells, life);
 						break;
 					case WETSAND:
-						sand.update(x, y, new_cells);
+						sand.update(x, y, new_cells, life);
 						break;
 					case METAL:
-						metal.update(x, y, new_cells);
+						metal.update(x, y, new_cells, life);
 						break;
 					case FIRE:
-						fire.update(x, y, new_cells);
+						fire.update(x, y, new_cells, life);
 						break;
 					case OIL:
-						oil.update(x, y, new_cells);
+						oil.update(x, y, new_cells, life);
+						break;
+					case LAVA:
+						lava.update(x, y, new_cells, life);
 						break;
 					default:
 						break;
@@ -130,22 +143,25 @@ public class FluidsHandler {
 					case ICE:
 						break;
 					case WATER:
-						water.update(x, y, new_cells);
+						water.update(x, y, new_cells, life);
 						break;
 					case SAND:
-						sand.update(x, y, new_cells);
+						sand.update(x, y, new_cells, life);
 						break;
 					case WETSAND:
-						sand.update(x, y, new_cells);
+						sand.update(x, y, new_cells, life);
 						break;
 					case METAL:
-						metal.update(x, y, new_cells);
+						metal.update(x, y, new_cells, life);
 						break;
 					case FIRE:
-						fire.update(x, y, new_cells);
+						fire.update(x, y, new_cells, life);
 						break;
 					case OIL:
-						oil.update(x, y, new_cells);
+						oil.update(x, y, new_cells, life);
+						break;
+					case LAVA:
+						lava.update(x, y, new_cells, life);
 						break;
 					default:
 						break;
@@ -165,6 +181,7 @@ public class FluidsHandler {
 
 	public void clearCell(int i, int j) {
 		new_cells[i][j] = AIR;
+		life[i][j] = 0;
 	}
 
 	public void makeRain() {
@@ -204,13 +221,16 @@ public class FluidsHandler {
 			sand.emit(i, j, new_cells);
 			break;
 		case Fire:
-			fire.add(i, j, new_cells);
+			fire.add(i, j, new_cells, life);
 			break;
 		case Ice:
 			ice.emit(i, j, new_cells);
 			break;
 		case Metal:
-			metal.emit(i, j, new_cells);
+			metal.emit(i, j, new_cells, life);
+			break;
+		case Lava:
+			lava.emit(i, j, new_cells);
 			break;
 		case Eraser:
 			clearCell(i, j);
@@ -276,6 +296,9 @@ public class FluidsHandler {
 			particuleType = type.Ice;
 			break;
 		case Ice:
+			particuleType = type.Lava;
+			break;
+		case Lava:
 			particuleType = type.Eraser;
 			break;
 		case Eraser:
@@ -319,21 +342,25 @@ public class FluidsHandler {
 					g.flush();
 					break;
 				case METAL:
-					Color e = new Color(
-							0.5f + (0.5f - (metal.getLife(i, j) / 2000f)),
-							0.5f, 0.5f, 1f);
+					Color e = new Color(0.5f + (0.5f - (metal.getLife(i, j,
+							life) / 2000f)), 0.5f, 0.5f, 1f);
 					g.setColor(e);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
 				case FIRE:
-					Color f = new Color(0.9f, 0f, 0f, 1f);
+					Color f = new Color(0.9f, 0.3f, 0f, 1f);
 					g.setColor(f);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
 				case ICE:
 					g.setColor(Color.white);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case LAVA:
+					g.setColor(Color.red);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;

@@ -10,7 +10,8 @@ public class Sand extends Fluid {
 		super(wi, he);
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] new_cells) {
+	public boolean swap(int i, int j, int x, int y, int[][] new_cells,
+			int[][] life) {
 		if (new_cells[x][y] == AIR || new_cells[x][y] == OIL) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -22,15 +23,28 @@ public class Sand extends Fluid {
 			new_cells[x][y] = WETSAND;
 			return true;
 		}
+		if (new_cells[x][y] == LAVA) {
+			new_cells[i][j] = AIR;
+			new_cells[x][y] = FIRE;
+			life[x][y] = 70;
+			return true;
+		}
 		return false;
 	}
 
-	public boolean wetsandSwap(int i, int j, int x, int y, int[][] new_cells) {
+	public boolean wetsandSwap(int i, int j, int x, int y, int[][] new_cells,
+			int[][] life) {
 		if (new_cells[x][y] == AIR || new_cells[x][y] == WATER
 				|| new_cells[x][y] == OIL || new_cells[x][y] == SAND) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
 			new_cells[x][y] = temp;
+			return true;
+		}
+		if (new_cells[x][y] == LAVA) {
+			new_cells[i][j] = AIR;
+			new_cells[x][y] = FIRE;
+			life[x][y] = 70;
 			return true;
 		}
 		return false;
@@ -82,33 +96,34 @@ public class Sand extends Fluid {
 		}
 	}
 
-	public void update(int x, int y, int[][] new_cells) throws SlickException {
+	public void update(int x, int y, int[][] new_cells, int[][] life)
+			throws SlickException {
 		if (new_cells[x][y] == SAND) {
 			// Down
-			if (swap(x, y, x, y + 1, new_cells))
+			if (swap(x, y, x, y + 1, new_cells, life))
 				return;
 			// Down right/down left
 			if (this.randomBoolean()) {
 				// right first
-				if (swap(x, y, x + 1, y + 1, new_cells))
+				if (swap(x, y, x + 1, y + 1, new_cells, life))
 					return;
 			} else {
 				// left first
-				if (swap(x, y, x - 1, y + 1, new_cells))
+				if (swap(x, y, x - 1, y + 1, new_cells, life))
 					return;
 			}
 		} else if (new_cells[x][y] == WETSAND) {
 			// Down
-			if (wetsandSwap(x, y, x, y + 1, new_cells))
+			if (wetsandSwap(x, y, x, y + 1, new_cells, life))
 				return;
 			// Down right/down left
 			if (this.randomBoolean()) {
 				// right first
-				if (wetsandSwap(x, y, x + 1, y + 1, new_cells))
+				if (wetsandSwap(x, y, x + 1, y + 1, new_cells, life))
 					return;
 			} else {
 				// left first
-				if (wetsandSwap(x, y, x - 1, y + 1, new_cells))
+				if (wetsandSwap(x, y, x - 1, y + 1, new_cells, life))
 					return;
 			}
 		}

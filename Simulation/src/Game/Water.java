@@ -60,7 +60,8 @@ public class Water extends Fluid {
 		}
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] new_cells) {
+	public boolean swap(int i, int j, int x, int y, int[][] new_cells,
+			int[][] life) {
 		if (new_cells[x][y] == AIR || new_cells[x][y] == OIL) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -72,8 +73,11 @@ public class Water extends Fluid {
 			new_cells[x][y] = WETSAND;
 			return true;
 		}
-		if (new_cells[x][y] == WETSAND) {
-			return false;
+		if (new_cells[x][y] == LAVA) {
+			new_cells[i][j] = AIR;
+			new_cells[x][y] = FIRE;
+			life[x][y] = 70;
+			return true;
 		}
 		if (new_cells[x][y] == METAL) {
 			return false;
@@ -81,39 +85,40 @@ public class Water extends Fluid {
 		return false;
 	}
 
-	public void update(int x, int y, int[][] new_cells) throws SlickException {
+	public void update(int x, int y, int[][] new_cells, int[][] life)
+			throws SlickException {
 		// some randomness in direction
 		if (Math.random() < 0.01f) {
 			// Down right/down left
 			if (randomBoolean()) {
-				if (swap(x, y, x + 1, y + 1, new_cells))
+				if (swap(x, y, x + 1, y + 1, new_cells, life))
 					return;
 			} else {
-				if (swap(x, y, x - 1, y + 1, new_cells))
+				if (swap(x, y, x - 1, y + 1, new_cells, life))
 					return;
 			}
 			// Down
-			if (swap(x, y, x, y + 1, new_cells))
+			if (swap(x, y, x, y + 1, new_cells, life))
 				return;
 		} else {
 			// Down
-			if (swap(x, y, x, y + 1, new_cells))
+			if (swap(x, y, x, y + 1, new_cells, life))
 				return;
 			// Down right/down left
 			if (randomBoolean()) {
-				if (swap(x, y, x + 1, y + 1, new_cells))
+				if (swap(x, y, x + 1, y + 1, new_cells, life))
 					return;
 			} else {
-				if (swap(x, y, x - 1, y + 1, new_cells))
+				if (swap(x, y, x - 1, y + 1, new_cells, life))
 					return;
 			}
 		}
 		// left/right
 		if (randomBoolean()) {
-			if (swap(x, y, x + 1, y, new_cells))
+			if (swap(x, y, x + 1, y, new_cells, life))
 				return;
 		} else {
-			if (swap(x, y, x - 1, y, new_cells))
+			if (swap(x, y, x - 1, y, new_cells, life))
 				return;
 		}
 	}
