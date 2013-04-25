@@ -11,7 +11,7 @@ public class Fluid {
 	final int METAL = 5;
 	final int FIRE = 6;
 	final int OIL = 7;
-
+	final int ICE = 8;
 	
 	public int w, h;
 	

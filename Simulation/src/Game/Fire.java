@@ -47,8 +47,7 @@ public class Fire extends Fluid {
 		life[i][j] = 0;
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] cells,
-			int[][] new_cells) {
+	public boolean swap(int i, int j, int x, int y, int[][] new_cells) {
 		if (new_cells[x][y] == AIR) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
@@ -58,7 +57,9 @@ public class Fire extends Fluid {
 			life[x][y] = temp;
 			return true;
 		}
-		if (new_cells[x][y] == SAND) {
+		if (new_cells[x][y] == ICE) {
+			clearCell(i, j, new_cells);
+			new_cells[x][y] = WATER;
 			return false;
 		}
 		if (new_cells[x][y] == WETSAND) {
@@ -70,8 +71,7 @@ public class Fire extends Fluid {
 		return false;
 	}
 
-	public void update(int i, int j, int[][] cells, int[][] new_cells)
-			throws SlickException {
+	public void update(int i, int j, int[][] new_cells) throws SlickException {
 		life[i][j]--;
 		if (getLife(i, j) <= 0)
 			clearCell(i, j, new_cells);
@@ -101,8 +101,8 @@ public class Fire extends Fluid {
 					new_cells[i + 1][j + 1] = FIRE;
 					life[i + 1][j + 1] = 70;
 				}
-				if (j > 1)
-					swap(i, j, i, j - 1, cells, new_cells);
+				if (j - 1 >= 1)
+					swap(i, j, i, j - 1, new_cells);
 			}
 		}
 	}

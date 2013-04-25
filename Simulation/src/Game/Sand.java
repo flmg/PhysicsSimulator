@@ -10,9 +10,8 @@ public class Sand extends Fluid {
 		super(wi, he);
 	}
 
-	public boolean swap(int i, int j, int x, int y, int[][] cells,
-			int[][] new_cells) {
-		if (new_cells[x][y] == AIR) {
+	public boolean swap(int i, int j, int x, int y, int[][] new_cells) {
+		if (new_cells[x][y] == AIR || new_cells[x][y] == OIL) {
 			int temp = new_cells[i][j];
 			new_cells[i][j] = new_cells[x][y];
 			new_cells[x][y] = temp;
@@ -21,6 +20,17 @@ public class Sand extends Fluid {
 		if (new_cells[x][y] == WATER) {
 			new_cells[i][j] = AIR;
 			new_cells[x][y] = WETSAND;
+			return true;
+		}
+		return false;
+	}
+
+	public boolean wetsandSwap(int i, int j, int x, int y, int[][] new_cells) {
+		if (new_cells[x][y] == AIR || new_cells[x][y] == WATER
+				|| new_cells[x][y] == OIL || new_cells[x][y] == SAND) {
+			int temp = new_cells[i][j];
+			new_cells[i][j] = new_cells[x][y];
+			new_cells[x][y] = temp;
 			return true;
 		}
 		return false;
@@ -72,24 +82,35 @@ public class Sand extends Fluid {
 		}
 	}
 
-	public void update(int x, int y, int[][] cells, int[][] new_cells)
-			throws SlickException {
-		// Down
-		if (swap(x, y, x, y + 1, cells, new_cells))
-			return;
-		// Down right/down left
-		if (this.randomBoolean()) {
-			// right first
-			if (swap(x, y, x + 1, y + 1, cells, new_cells))
+	public void update(int x, int y, int[][] new_cells) throws SlickException {
+		if (new_cells[x][y] == SAND) {
+			// Down
+			if (swap(x, y, x, y + 1, new_cells))
 				return;
-		} else {
-			// left first
-			if (swap(x, y, x - 1, y + 1, cells, new_cells))
+			// Down right/down left
+			if (this.randomBoolean()) {
+				// right first
+				if (swap(x, y, x + 1, y + 1, new_cells))
+					return;
+			} else {
+				// left first
+				if (swap(x, y, x - 1, y + 1, new_cells))
+					return;
+			}
+		} else if (new_cells[x][y] == WETSAND) {
+			// Down
+			if (wetsandSwap(x, y, x, y + 1, new_cells))
 				return;
+			// Down right/down left
+			if (this.randomBoolean()) {
+				// right first
+				if (wetsandSwap(x, y, x + 1, y + 1, new_cells))
+					return;
+			} else {
+				// left first
+				if (wetsandSwap(x, y, x - 1, y + 1, new_cells))
+					return;
+			}
 		}
-		/*
-		 * // wet sand case if (new_cells[x][y] == SAND && new_cells[x][y - 1]
-		 * == WETSAND) swap(x, y, x, y - 1, cells, new_cells);
-		 */
 	}
 }

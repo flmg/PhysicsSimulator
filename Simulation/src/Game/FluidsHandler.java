@@ -20,6 +20,7 @@ public class FluidsHandler {
 	final int METAL = 5;
 	final int FIRE = 6;
 	final int OIL = 7;
+	final int ICE = 8;
 
 	// Data structures
 	public int[][] cells, new_cells;
@@ -33,9 +34,10 @@ public class FluidsHandler {
 	public Metal metal;
 	public Fire fire;
 	public Oil oil;
+	public Ice ice;
 
 	public enum type {
-		Water, Oil, Block, Sand, Metal, Fire, Eraser
+		Water, Oil, Block, Sand, Metal, Fire, Ice, Eraser
 	};
 
 	public type particuleType;
@@ -52,6 +54,7 @@ public class FluidsHandler {
 		sand = new Sand(w, h);
 		metal = new Metal(w, h);
 		fire = new Fire(w, h);
+		ice = new Ice(w, h);
 		particuleType = type.Water;
 		clear();
 	}
@@ -92,23 +95,25 @@ public class FluidsHandler {
 						break;
 					case BLOCK:
 						break;
+					case ICE:
+						break;
 					case WATER:
-						water.update(x, y, cells, new_cells);
+						water.update(x, y, new_cells);
 						break;
 					case SAND:
-						sand.update(x, y, cells, new_cells);
+						sand.update(x, y, new_cells);
 						break;
 					case WETSAND:
-						sand.update(x, y, cells, new_cells);
+						sand.update(x, y, new_cells);
 						break;
 					case METAL:
-						metal.update(x, y, cells, new_cells);
+						metal.update(x, y, new_cells);
 						break;
 					case FIRE:
-						fire.update(x, y, cells, new_cells);
+						fire.update(x, y, new_cells);
 						break;
 					case OIL:
-						oil.update(x, y, cells, new_cells);
+						oil.update(x, y, new_cells);
 						break;
 					default:
 						break;
@@ -122,23 +127,25 @@ public class FluidsHandler {
 						break;
 					case BLOCK:
 						break;
+					case ICE:
+						break;
 					case WATER:
-						water.update(x, y, cells, new_cells);
+						water.update(x, y, new_cells);
 						break;
 					case SAND:
-						sand.update(x, y, cells, new_cells);
+						sand.update(x, y, new_cells);
 						break;
 					case WETSAND:
-						sand.update(x, y, cells, new_cells);
+						sand.update(x, y, new_cells);
 						break;
 					case METAL:
-						metal.update(x, y, cells, new_cells);
+						metal.update(x, y, new_cells);
 						break;
 					case FIRE:
-						fire.update(x, y, cells, new_cells);
+						fire.update(x, y, new_cells);
 						break;
 					case OIL:
-						oil.update(x, y, cells, new_cells);
+						oil.update(x, y, new_cells);
 						break;
 					default:
 						break;
@@ -199,6 +206,12 @@ public class FluidsHandler {
 		case Fire:
 			fire.add(i, j, new_cells);
 			break;
+		case Ice:
+			ice.emit(i, j, new_cells);
+			break;
+		case Metal:
+			metal.emit(i, j, new_cells);
+			break;
 		case Eraser:
 			clearCell(i, j);
 			if (i - 1 >= 1 && j - 1 >= 1) // up left
@@ -237,9 +250,6 @@ public class FluidsHandler {
 			if (i + 1 <= w && j + 1 <= h) // down right
 				new_cells[i + 1][j + 1] = BLOCK;
 			break;
-		case Metal:
-			metal.add(i, j, new_cells);
-			break;
 		default:
 			break;
 		}
@@ -263,6 +273,9 @@ public class FluidsHandler {
 			particuleType = type.Fire;
 			break;
 		case Fire:
+			particuleType = type.Ice;
+			break;
+		case Ice:
 			particuleType = type.Eraser;
 			break;
 		case Eraser:
@@ -289,7 +302,7 @@ public class FluidsHandler {
 					g.flush();
 					break;
 				case BLOCK:
-					Color c = new Color(0.9f, 0.9f, 0.9f, 1f);
+					Color c = new Color(0.8f, 0.8f, 0.8f, 1f);
 					g.setColor(c);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
@@ -316,6 +329,11 @@ public class FluidsHandler {
 				case FIRE:
 					Color f = new Color(0.9f, 0f, 0f, 1f);
 					g.setColor(f);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case ICE:
+					g.setColor(Color.white);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;
