@@ -50,6 +50,18 @@ public class Sand extends Fluid {
 		return false;
 	}
 
+	public boolean rockSwap(int i, int j, int x, int y, int[][] new_cells,
+			int[][] life) {
+		if (new_cells[x][y] == AIR || new_cells[x][y] == WATER
+				|| new_cells[x][y] == OIL || new_cells[x][y] == LAVA) {
+			int temp = new_cells[i][j];
+			new_cells[i][j] = new_cells[x][y];
+			new_cells[x][y] = temp;
+			return true;
+		}
+		return false;
+	}
+
 	public void emit(int i, int j, int[][] new_cells) {
 		if (Math.random() < 0.25) {
 			if (new_cells[i][j] == AIR) // center
@@ -124,6 +136,20 @@ public class Sand extends Fluid {
 			} else {
 				// left first
 				if (wetsandSwap(x, y, x - 1, y + 1, new_cells, life))
+					return;
+			}
+		} else if (new_cells[x][y] == ROCK) {
+			// Down
+			if (rockSwap(x, y, x, y + 1, new_cells, life))
+				return;
+			// Down right/down left
+			if (this.randomBoolean()) {
+				// right first
+				if (rockSwap(x, y, x + 1, y + 1, new_cells, life))
+					return;
+			} else {
+				// left first
+				if (rockSwap(x, y, x - 1, y + 1, new_cells, life))
 					return;
 			}
 		}

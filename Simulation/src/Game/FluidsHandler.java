@@ -22,6 +22,7 @@ public class FluidsHandler {
 	final int OIL = 7;
 	final int ICE = 8;
 	final int LAVA = 9;
+	final int ROCK = 10;
 
 	// map
 	public int[][] cells, new_cells, life;
@@ -116,6 +117,9 @@ public class FluidsHandler {
 					case WETSAND:
 						sand.update(x, y, new_cells, life);
 						break;
+					case ROCK:
+						sand.update(x, y, new_cells, life);
+						break;
 					case METAL:
 						metal.update(x, y, new_cells, life);
 						break;
@@ -149,6 +153,9 @@ public class FluidsHandler {
 						sand.update(x, y, new_cells, life);
 						break;
 					case WETSAND:
+						sand.update(x, y, new_cells, life);
+						break;
+					case ROCK:
 						sand.update(x, y, new_cells, life);
 						break;
 					case METAL:
@@ -276,23 +283,23 @@ public class FluidsHandler {
 	}
 
 	public void changeParticules(int y) {
-		if(y >= 200)
+		if (y >= 200)
 			particuleType = type.Water;
-		if(y >= 225)
+		if (y >= 225)
 			particuleType = type.Oil;
-		if(y >= 250)
+		if (y >= 250)
 			particuleType = type.Block;
-		if(y >= 275)
+		if (y >= 275)
 			particuleType = type.Sand;
-		if(y >= 300)
+		if (y >= 300)
 			particuleType = type.Metal;
-		if(y >= 325)
+		if (y >= 325)
 			particuleType = type.Fire;
-		if(y >= 350)
+		if (y >= 350)
 			particuleType = type.Ice;
-		if(y >= 375)
+		if (y >= 375)
 			particuleType = type.Lava;
-		if(y >= 400)
+		if (y >= 400)
 			particuleType = type.Eraser;
 	}
 
@@ -325,6 +332,12 @@ public class FluidsHandler {
 				case WETSAND:
 					Color d = new Color(0.3f, 0.3f, 0f, 1f);
 					g.setColor(d);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case ROCK:
+					Color h = new Color(0.15f, 0.15f, 0.15f, 1f);
+					g.setColor(h);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;

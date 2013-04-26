@@ -13,6 +13,7 @@ public class Fluid {
 	final int OIL = 7;
 	final int ICE = 8;
 	final int LAVA = 9;
+	final int ROCK = 10;
 	
 	public int w, h;
 	

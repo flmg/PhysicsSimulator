@@ -75,12 +75,8 @@ public class Water extends Fluid {
 		}
 		if (new_cells[x][y] == LAVA) {
 			new_cells[i][j] = AIR;
-			new_cells[x][y] = FIRE;
-			life[x][y] = 70;
+			new_cells[x][y] = ROCK;
 			return true;
-		}
-		if (new_cells[x][y] == METAL) {
-			return false;
 		}
 		return false;
 	}
