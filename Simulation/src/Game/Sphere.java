@@ -68,7 +68,7 @@ public class Sphere {
 		for (int i = 0; i < lines.size(); i++)
 			collisionL2S(lines.get(i));
 
-		//checkBounds();
+		checkBounds();
 
 		// Movements
 		posX += velX * dt;
@@ -116,7 +116,6 @@ public class Sphere {
 
 		if (c1 >= 0 && c2 >= c1)
 		{
-
 			double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
 
 			short signX = (short) Math.signum(l.y0 - l.y1);
@@ -125,39 +124,41 @@ public class Sphere {
 			double sY = -signX * ((l.y1 - l.y0) / l0);
 			double sX = signX * ((l.x1 - l.x0) / l0);
 			
-			if (inRange(newX, newY, size))
+			if (inRange(newX, newY, size + 1))
 			{
-				if (l.isVertical())
+				if (inRange(newX, newY, size))
 				{
-					if (velX > 0)
-						posX = newX - size * 2;
-					else
-						posX = newX;
+					if (l.isVertical())
+					{
+						if (velX > 0)
+							posX = newX - size * 2;
+						else
+							posX = newX;
 
-					posY = newY - size;
-				}
-				else if (l.isHorizontal())
-				{
-					if (velY > 0)
-						posY = newY - size * 2;
+						posY = newY - size;
+					}
+					else if (l.isHorizontal())
+					{
+						if (velY > 0)
+							posY = newY - size * 2;
+						else
+							posY = newY;
+
+						posX = newX - size;
+					}
 					else
+					{
+						double s = l.slope(); 
+						double coefX = 1 - Math.min(1, s); 
+						double coefY = 2;
+
+						newX -= size * coefX;
+						newY -= size * coefY;
+
+						posX = newX; 
 						posY = newY;
-
-					posX = newX - size;
+					}
 				}
-				else
-				{
-					double s = l.slope(); 
-					double coefX = 1 - Math.min(1, s); 
-					double coefY = 2;
-
-					newX -= size * coefX;
-					newY -= size * coefY;
-
-					posX = newX; 
-					posY = newY;
-				}
-				
 				reflectionV(sY,sX);	
 			}
 		}
@@ -174,7 +175,6 @@ public class Sphere {
 	}
 
 	// We check if the ball is outside the bounds
-	@SuppressWarnings("unused")
 	private void checkBounds()
 	{
 		if (posX < 0)

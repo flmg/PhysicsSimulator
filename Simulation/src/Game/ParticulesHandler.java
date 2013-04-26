@@ -46,8 +46,11 @@ public class ParticulesHandler
 	}
 
 	public void render(GameContainer gc, Graphics g, int x, int y) throws SlickException {
+
+		g.setColor(Color.white);
 		for (int i = 0; i < spheres.size(); i++)
 			spheres.get(i).render(gc, g);
+		
 		for (int i = 0; i < lines.size(); i++)
 		{
 			Line l = lines.get(i);
