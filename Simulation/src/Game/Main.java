@@ -28,7 +28,7 @@ public class Main extends BasicGame {
 			e.printStackTrace();
 		}
 		this.fluids = new FluidsHandler(gc, 2);
-		this.panel = new MaterialsPanel();
+		this.panel = new MaterialsPanel(100, 240);
 		bt = 1.0f;
 		// load a default java font
 		Font awtFont = new Font("Arial", Font.TRUETYPE_FONT, 18);
@@ -47,19 +47,26 @@ public class Main extends BasicGame {
 			fluids.update();
 			// Mouse left clicked
 			if (ip.isMousePressed(0)) {
-				if (ip.isKeyDown(Input.KEY_LCONTROL))
-					particules.addLine(mouseX, mouseY);
-				else
-					particules.addSphere(mouseX, mouseY, 1024, 500, texture);
+				// if panel is clicked
+				if (panel.isDrawn && mouseX >= 0 && mouseX <= panel.width
+						&& mouseY <= 190 + panel.height && mouseY >= 190) {
+					fluids.changeParticules(mouseY);
+				} else {
+					if (ip.isKeyDown(Input.KEY_LCONTROL))
+						particules.addLine(mouseX, mouseY);
+					else
+						particules
+								.addSphere(mouseX, mouseY, 1024, 500, texture);
+				}
 			}
 			// right click (add particle)
 			if (ip.isMouseButtonDown(1)) {
 				fluids.emitParticles(mouseX / fluids.scale, mouseY
 						/ fluids.scale, fluids.particuleType);
 			}
-			// mode selection
-			if (ip.isKeyPressed(Input.KEY_M)) {
-				fluids.changeParticules();
+			// inventory
+			if (ip.isKeyPressed(Input.KEY_I)) {
+				panel.isDrawn = !panel.isDrawn;
 			}
 			// rain
 			if (ip.isKeyPressed(Input.KEY_R)) {
@@ -109,8 +116,11 @@ public class Main extends BasicGame {
 
 	@Override
 	public void render(GameContainer gc, Graphics g) throws SlickException {
+		// particles
+		g.setColor(Color.white);
 		particules.render(gc, g, mouseX, mouseY);
 		fluids.render(g);
+		// text
 		g.setColor(Color.white);
 		g.drawString(
 				String.format("%d ball(s) (TAB to reset)", particules.count()),
@@ -119,12 +129,11 @@ public class Main extends BasicGame {
 				String.format("Click (balls) ; Ctrl+Click (line)",
 						particules.count()), 10, 60);
 		g.drawString(String.format("Speed: %.2f", bt), 10, 85);
-		g.drawString("M to switch particle, R to make rain", 10, 110);
-		g.drawString("Scale: " + fluids.scale + " (+ / -)", 10, 135);
-
+		g.drawString("R (rain) I (inventory)", 10, 110);
+		g.drawString("Scale: " + fluids.scale + " (+/s-)", 10, 135);
+		// materials panel
 		panel.render(g, font, fluids);
 
-		g.setColor(Color.black);
 		g.flush();
 	}
 

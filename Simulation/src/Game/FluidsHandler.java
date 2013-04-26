@@ -275,38 +275,25 @@ public class FluidsHandler {
 		}
 	}
 
-	public void changeParticules() {
-		switch (particuleType) {
-		case Water:
-			particuleType = type.Oil;
-			break;
-		case Oil:
-			particuleType = type.Block;
-			break;
-		case Block:
-			particuleType = type.Sand;
-			break;
-		case Sand:
-			particuleType = type.Metal;
-			break;
-		case Metal:
-			particuleType = type.Fire;
-			break;
-		case Fire:
-			particuleType = type.Ice;
-			break;
-		case Ice:
-			particuleType = type.Lava;
-			break;
-		case Lava:
-			particuleType = type.Eraser;
-			break;
-		case Eraser:
+	public void changeParticules(int y) {
+		if(y >= 200)
 			particuleType = type.Water;
-			break;
-		default:
-			break;
-		}
+		if(y >= 225)
+			particuleType = type.Oil;
+		if(y >= 250)
+			particuleType = type.Block;
+		if(y >= 275)
+			particuleType = type.Sand;
+		if(y >= 300)
+			particuleType = type.Metal;
+		if(y >= 325)
+			particuleType = type.Fire;
+		if(y >= 350)
+			particuleType = type.Ice;
+		if(y >= 375)
+			particuleType = type.Lava;
+		if(y >= 400)
+			particuleType = type.Eraser;
 	}
 
 	public void render(Graphics g) throws SlickException {
