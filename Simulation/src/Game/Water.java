@@ -74,7 +74,8 @@ public class Water extends Fluid {
 			return true;
 		}
 		if (new_cells[x][y] == LAVA) {
-			new_cells[i][j] = AIR;
+			new_cells[i][j] = SMOKE;
+			life[i][j] = 15;
 			new_cells[x][y] = ROCK;
 			return true;
 		}

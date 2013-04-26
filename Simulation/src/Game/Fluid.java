@@ -14,6 +14,7 @@ public class Fluid {
 	final int ICE = 8;
 	final int LAVA = 9;
 	final int ROCK = 10;
+	final int SMOKE = 11;
 	
 	public int w, h;
 	

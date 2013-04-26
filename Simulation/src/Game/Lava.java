@@ -63,17 +63,23 @@ public class Lava extends Fluid {
 			new_cells[x][y] = temp;
 			return true;
 		}
-		if (new_cells[x][y] == ICE || new_cells[x][y] == SAND
-				|| new_cells[x][y] == METAL || new_cells[x][y] == WETSAND
-				|| new_cells[x][y] == OIL) {
+		if (new_cells[x][y] == SAND || new_cells[x][y] == METAL
+				|| new_cells[x][y] == WETSAND || new_cells[x][y] == OIL) {
 			new_cells[i][j] = AIR;
 			new_cells[x][y] = FIRE;
-			life[x][y] = 70;
+			life[x][y] = 25;
 			return true;
 		}
 		if (new_cells[x][y] == WATER) {
-			new_cells[i][j] = AIR;
+			new_cells[i][j] = SMOKE;
+			life[i][j] = 15;
 			new_cells[x][y] = ROCK;
+			return true;
+		}
+		if (new_cells[x][y] == ICE) {
+			new_cells[i][j] = AIR;
+			new_cells[x][y] = SMOKE;
+			life[x][y] = 15;
 			return true;
 		}
 		return false;

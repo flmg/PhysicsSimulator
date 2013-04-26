@@ -23,6 +23,7 @@ public class FluidsHandler {
 	final int ICE = 8;
 	final int LAVA = 9;
 	final int ROCK = 10;
+	final int SMOKE = 11;
 
 	// map
 	public int[][] cells, new_cells, life;
@@ -102,12 +103,6 @@ public class FluidsHandler {
 				// from left to right
 				for (int x = 1; x <= w; x++) {
 					switch (cells[x][y]) {
-					case AIR:
-						break;
-					case BLOCK:
-						break;
-					case ICE:
-						break;
 					case WATER:
 						water.update(x, y, new_cells, life);
 						break;
@@ -126,6 +121,9 @@ public class FluidsHandler {
 					case FIRE:
 						fire.update(x, y, new_cells, life);
 						break;
+					case SMOKE:
+						fire.update(x, y, new_cells, life);
+						break;
 					case OIL:
 						oil.update(x, y, new_cells, life);
 						break;
@@ -140,12 +138,6 @@ public class FluidsHandler {
 				// from right to left
 				for (int x = w; x >= 1; x--) {
 					switch (cells[x][y]) {
-					case AIR:
-						break;
-					case BLOCK:
-						break;
-					case ICE:
-						break;
 					case WATER:
 						water.update(x, y, new_cells, life);
 						break;
@@ -162,6 +154,9 @@ public class FluidsHandler {
 						metal.update(x, y, new_cells, life);
 						break;
 					case FIRE:
+						fire.update(x, y, new_cells, life);
+						break;
+					case SMOKE:
 						fire.update(x, y, new_cells, life);
 						break;
 					case OIL:
@@ -361,6 +356,12 @@ public class FluidsHandler {
 					break;
 				case LAVA:
 					g.setColor(Color.red);
+					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
+					g.flush();
+					break;
+				case SMOKE:
+					Color k = new Color(1f, 1f, 1f, 0.9f);
+					g.setColor(k);
 					g.fillRect((i - 1) * scale, (j - 1) * scale, scale, scale);
 					g.flush();
 					break;

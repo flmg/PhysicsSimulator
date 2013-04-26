@@ -33,6 +33,9 @@ public class Main extends BasicGame {
 		// load a default java font
 		Font awtFont = new Font("Arial", Font.TRUETYPE_FONT, 18);
 		font = new TrueTypeFont(awtFont, true);
+		// time between updates
+		gc.setMinimumLogicUpdateInterval(15);
+		gc.setMaximumLogicUpdateInterval(15);
 	}
 
 	@Override
@@ -130,7 +133,7 @@ public class Main extends BasicGame {
 						particules.count()), 10, 60);
 		g.drawString(String.format("Speed: %.2f", bt), 10, 85);
 		g.drawString("R (rain) I (inventory)", 10, 110);
-		g.drawString("Scale: " + fluids.scale + " (+/s-)", 10, 135);
+		g.drawString("Scale: " + fluids.scale + " (+/-)", 10, 135);
 		// materials panel
 		panel.render(g, font, fluids);
 
