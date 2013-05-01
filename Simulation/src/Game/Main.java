@@ -133,8 +133,6 @@ public class Main extends BasicGame {
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		// particles
 		g.setColor(Color.white);
-		particules.render(gc, g, mouseX, mouseY);
-		fluids.render(g);
 		// text
 		g.setColor(Color.white);
 		g.drawString(
@@ -149,6 +147,9 @@ public class Main extends BasicGame {
 		// materials panel
 		panel.render(g, font, fluids);
 
+		fluids.render(g);
+		particules.render(gc, g, mouseX, mouseY);
+		
 		g.flush();
 	}
 

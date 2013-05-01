@@ -48,7 +48,7 @@ public class ParticulesHandler
 
 	public void render(GameContainer gc, Graphics g, int x, int y) throws SlickException {
 
-		g.setColor(Color.white);
+		g.setColor(Color.red);
 		for (int i = 0; i < spheres.size(); i++)
 			spheres.get(i).render(gc, g);
 
@@ -66,24 +66,24 @@ public class ParticulesHandler
 			// We check for collisions for all other spheres
 			for (int j = i + 1; j < spheres.size(); j++)
 				collision(spheres.get(i),spheres.get(j));
-				if (spheres.get(i).selected)
-					spheres.get(i).update(x, y, dt);
-				else
-					spheres.get(i).update(dt, lines);
+			if (spheres.get(i).selected)
+				spheres.get(i).update(x, y, dt);
+			else
+				spheres.get(i).update(dt, lines);
 		}
 	}
 	public void getBlocks(int cells[][])
 	{
 		boolean end = false;
-		for (int i = 1; i <= w / scale && !end; i++) {
-			for (int j = 1; j <= h / scale && !end; j++) {
-				if (cells[i][j] == 1)
+		for (int j = 1; j <= h / scale && !end; j++) {
+			for (int i = 1; i <= w / scale && !end; i++) {
+				if (cells[i][j] == 1 && (cells[i][j - 1] == 0 || cells[i][j + 1] == 0 || cells[i - 1][j] == 0 || cells[i + 1][j] == 0))
 				{
 					int x0 = (i - 1) * scale, y0 = (j - 1)  * scale;
 					// start top line
 					addLine(x0, y0);
 					int x1 = i, y1 = j;
-					for (; cells[x1][y1] == 1 && x1 <= w / scale; x1++);
+					for (; (cells[i][j - 1] == 0 || cells[i][j + 1] == 0) && cells[x1][y1] == 1 && x1 <= w / scale; x1++);
 					if (x1 - i > 1)
 						// end top line
 						addLine((x1 - 1) * scale, (y1 - 1)  * scale);
@@ -96,7 +96,7 @@ public class ParticulesHandler
 					// start left side line
 					addLine(x0, y0);
 					int x2 = i, y2 = j;
-					for (; cells[x2][y2] == 1 && y2 <= h / scale; y2++);
+					for (; (cells[i - 1][j] == 0 || cells[i + 1][j] == 0) && cells[x2][y2] == 1 && y2 <= h / scale; y2++);
 					if (y2 - j > 1)
 					{
 						// end left side line
@@ -115,7 +115,6 @@ public class ParticulesHandler
 						tempX0 = -1;
 						tempY0 = -1;
 					}
-					end = true;
 				}
 			}
 		}
@@ -275,7 +274,7 @@ public class ParticulesHandler
 			//            this.lines.add(new Line(x + px+py, y + py-px, x - px+py, y - (py+px), false));
 			//            this.lines.add(new Line(tempX0 + px-py, tempY0 + py+px,  tempX0 - (px+py), tempY0 - (py-px), false));
 			//
-			
+
 			this.lines.add(new Line(tempX0, tempY0, x, y, false));
 			tempX0 = -1;
 			tempY0 = -1;
