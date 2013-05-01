@@ -15,6 +15,7 @@ public class ParticulesHandler
 	private float tempY0;
 	private int w,h;
 	private boolean gravity;
+	public int scale;
 
 	public ParticulesHandler(int w, int h) {
 		this.spheres = new LinkedList<Sphere>();
@@ -60,15 +61,63 @@ public class ParticulesHandler
 			g.drawLine(tempX0, tempY0, x, y);
 	}
 
-	public void update(double dt, double x, double y) throws SlickException {
+	public void update(double dt, double x, double y, int cells[][]) throws SlickException {
 		for (int i = 0; i < spheres.size(); i++) {
 			// We check for collisions for all other spheres
 			for (int j = i + 1; j < spheres.size(); j++)
 				collision(spheres.get(i),spheres.get(j));
-			if (spheres.get(i).selected)
-				spheres.get(i).update(x, y, dt);
-			else
-				spheres.get(i).update(dt, lines);
+				if (spheres.get(i).selected)
+					spheres.get(i).update(x, y, dt);
+				else
+					spheres.get(i).update(dt, lines);
+		}
+	}
+	public void getBlocks(int cells[][])
+	{
+		boolean end = false;
+		for (int i = 1; i <= w / scale && !end; i++) {
+			for (int j = 1; j <= h / scale && !end; j++) {
+				if (cells[i][j] == 1)
+				{
+					int x0 = (i - 1) * scale, y0 = (j - 1)  * scale;
+					// start top line
+					addLine(x0, y0);
+					int x1 = i, y1 = j;
+					for (; cells[x1][y1] == 1 && x1 <= w / scale; x1++);
+					if (x1 - i > 1)
+						// end top line
+						addLine((x1 - 1) * scale, (y1 - 1)  * scale);
+					else
+					{
+						tempX0 = -1;
+						tempY0 = -1;
+					}
+
+					// start left side line
+					addLine(x0, y0);
+					int x2 = i, y2 = j;
+					for (; cells[x2][y2] == 1 && y2 <= h / scale; y2++);
+					if (y2 - j > 1)
+					{
+						// end left side line
+						addLine((x2 - 1) * scale, (y2 - 1)  * scale);
+
+						//  bottom line
+						addLine((x2 - 1) * scale, (y2 - 1)  * scale);
+						addLine((x1 - 1) * scale, (y2 - 1)  * scale);
+
+						// right side line
+						addLine((x1 - 1) * scale, (y1 - 1)  * scale);
+						addLine((x1 - 1) * scale, (y2 - 1)  * scale);
+					}
+					else
+					{
+						tempX0 = -1;
+						tempY0 = -1;
+					}
+					end = true;
+				}
+			}
 		}
 	}
 
@@ -101,7 +150,9 @@ public class ParticulesHandler
 	{
 		// if balls are moving toward each other and they are close 
 		// the 10^-9 is here to compensate the eventual rounding error
-		if (movingToBall(A, B) && distance(A,B) <= Math.pow(A.size + B.size + Math.pow(10,-9), 2))
+		double dist = distance(A,B);
+		double err = Math.pow(10,-9);
+		if (movingToBall(A, B) &&  dist <= Math.pow(A.size + B.size + err, 2))
 		{ 
 			// Calculation of the resulting impulse for each ball
 			double nx = (A.posX - B.posX) / (A.size + B.size); // Normalized vector in X
@@ -113,10 +164,10 @@ public class ParticulesHandler
 
 			// Repositioning if the collision has gone too far
 			// And if balls are overlapping
-			double angle = Math.atan2(B.posY - A.posY,B.posX - A.posX);
-			double tomove = B.size + A.size - Math.sqrt(distance(A, B));
-			if (tomove > Math.pow(10,-9))
+			double tomove = B.size + A.size - Math.sqrt(dist);
+			if (tomove > err)
 			{
+				double angle = Math.atan2(B.posY - A.posY,B.posX - A.posX);
 				B.posX += Math.cos(angle) * (tomove);
 				B.posY += Math.sin(angle) * (tomove);
 			}
@@ -183,7 +234,7 @@ public class ParticulesHandler
 					}
 				}
 
-				Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.9f,0.9f), (float)s, texture, gravity);
+				Sphere p = new Sphere(x - size, y - size, WIDTH, HEIGHT, random(0.4f,0.9f), (float)s, texture, gravity);
 				this.spheres.add(p);
 			}
 			else {
@@ -224,7 +275,7 @@ public class ParticulesHandler
 			//            this.lines.add(new Line(x + px+py, y + py-px, x - px+py, y - (py+px), false));
 			//            this.lines.add(new Line(tempX0 + px-py, tempY0 + py+px,  tempX0 - (px+py), tempY0 - (py-px), false));
 			//
-
+			
 			this.lines.add(new Line(tempX0, tempY0, x, y, false));
 			tempX0 = -1;
 			tempY0 = -1;

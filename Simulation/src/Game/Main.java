@@ -9,13 +9,14 @@ import java.awt.Font;
 public class Main extends BasicGame {
 
 	private Image texture;
-	private ParticulesHandler particules = new ParticulesHandler(1024, 500);
+	private ParticulesHandler particules;
 	private double bt;
 	private FluidsHandler fluids;
 	private MaterialsPanel panel;
 	private int mouseX, mouseY;
 	TrueTypeFont font;
-
+	int width, height;
+	
 	public Main() {
 		super("Physics Simulation");
 	}
@@ -27,6 +28,10 @@ public class Main extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
+		
+		width = gc.getWidth();
+		height = gc.getHeight();
+		
 		this.fluids = new FluidsHandler(gc, 2);
 		this.panel = new MaterialsPanel(100, 240);
 		bt = 1.0f;
@@ -36,6 +41,8 @@ public class Main extends BasicGame {
 		// time between updates
 		gc.setMinimumLogicUpdateInterval(15);
 		gc.setMaximumLogicUpdateInterval(15);
+		
+		particules = new ParticulesHandler(width, height);
 	}
 
 	@Override
@@ -43,10 +50,10 @@ public class Main extends BasicGame {
 		Input ip = gc.getInput();
 		mouseX = ip.getMouseX();
 		mouseY = ip.getMouseY();
-		particules.update(bt * (double) delta / 1000f, mouseX, mouseY);
 
 		// if unpaused
 		if (bt > 0) {
+			particules.update(bt * (double) delta / 1000f, mouseX, mouseY, fluids.cells);
 			fluids.update();
 			// Mouse left clicked
 			if (ip.isMousePressed(0)) {
@@ -58,7 +65,7 @@ public class Main extends BasicGame {
 					if (ip.isKeyDown(Input.KEY_LCONTROL))
 						particules.addLine(mouseX, mouseY);
 					else
-						particules.addSphere(mouseX, mouseY, 1024, 500, texture);
+						particules.addSphere(mouseX, mouseY, width, height, texture);
 				}
 			}
 			// right click (add particle)
@@ -78,12 +85,14 @@ public class Main extends BasicGame {
 			if (ip.isKeyPressed(Input.KEY_SUBTRACT)) {
 				if (fluids.scale >= 2) {
 					int new_scale = fluids.scale / 2;
+					particules.scale = new_scale;
 					fluids = new FluidsHandler(gc, new_scale);
 				}
 			}
 			if (ip.isKeyPressed(Input.KEY_ADD)) {
 				if (fluids.scale <= 4) {
 					int new_scale = fluids.scale * 2;
+					particules.scale = new_scale;
 					fluids = new FluidsHandler(gc, new_scale);
 				}
 			}
@@ -114,6 +123,10 @@ public class Main extends BasicGame {
 		if (ip.isKeyPressed(Input.KEY_ESCAPE)) {
 			System.exit(0);
 		}
+		if (ip.isKeyPressed(Input.KEY_SPACE)) {
+			particules.getBlocks(fluids.cells);
+		}
+		
 	}
 
 	@Override

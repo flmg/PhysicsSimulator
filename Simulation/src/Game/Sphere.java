@@ -55,7 +55,8 @@ public class Sphere {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		this.texture.draw((float)posX, (float)posY, (float)scale);
+		if (this.texture != null)
+			this.texture.draw((float)posX, (float)posY, (float)scale);
 	}
 	// Normal update
 	public void update(double dt, LinkedList<Line> lines) throws SlickException {
@@ -100,70 +101,90 @@ public class Sphere {
 	{
 		return (uX * vX + uY * vY);
 	}
-
+	private void collisionEndpoint(float x1, float y1)
+	{
+		// Calculation of the resulting impulse for each ball
+		final double endMass = mass;
+		double collisiondist = Math.sqrt(Math.pow(x1 - (posX + size), 2) + Math.pow(y1 - (posY + size), 2));
+		double n_x = (x1 - (posX + size)) / collisiondist;
+		double n_y = (y1 - (posY + size)) / collisiondist;
+		double p = 2 * (velX * n_x + velY * n_y) / (mass + endMass);
+		double w_x = velX - p * mass * n_x - p * endMass * n_x;
+		double w_y = velY - p * mass * n_y - p * endMass * n_y;
+		velX = w_x;
+		velY = w_y;
+	}
 	private void collisionL2S(Line l) { 
-		double vX = l.x1 - l.x0;
-		double vY = l.y1 - l.y0;
-
-		double wX = (posX + size) - l.x0;
-		double wY = (posY + size) - l.y0;
-
-		double c1 = dot(wX,wY,vX,vY);
-		double c2 = dot(vX,vY,vX,vY);
-
-		double b = c1 / c2;
-		double newX = l.x0 + b * vX;
-		double newY = l.y0 + b * vY;
-
-		if (c1 >= 0 && c2 >= c1)
+		if (!l.isBound && inRange(l.x0, l.y0, size))
+			collisionEndpoint(l.x0, l.y0);
+		else if (!l.isBound && inRange(l.x1, l.y1, size))
+			collisionEndpoint(l.x1, l.y1);
+		else
 		{
-			if (inRange(newX, newY, size))
+			int t = 0;
+			double vX = (l.x1 + t) - (l.x0 - t);
+			double vY = l.y1 - l.y0;
+
+			double wX = (posX + size) - (l.x0 - t);
+			double wY = (posY + size) - l.y0;
+
+			double c1 = dot(wX,wY,vX,vY);
+			double c2 = dot(vX,vY,vX,vY);
+
+			double b = c1 / c2;
+			double newX = (l.x0 - t) + b * vX;
+			double newY = l.y0 + b * vY;
+
+			if (c1 > 0 && c2 > c1)
 			{
-				if (inRange(newX, newY, size - 1))
+				if (inRange(newX, newY, size))
 				{
-					if (l.isVertical())
+					if (inRange(newX, newY, size - 1))
 					{
-						if (velX > 0)
-							newX -= size * 2;
-
-						newY -= size;
-					}
-					else if (l.isHorizontal())
-					{
-						if (velY > 0)
-							newY -= size * 2;
-
-						newX -= size;
-					}
-					else
-					{
-						double s1 = l.slope(); 
-						double s2 = (new Line(l.x0, l.y0, (float)(posX + size), (float)(posY + size), false)).slope();
-
-						double coefX = 1 - Math.min(1, s1); 
-						double coefY = 2;
-
-						if (s2 <= s1)
+						if (l.isVertical())
 						{
-							newX -= size * coefX;
-							newY -= size * coefY;
+							if (velX > 0)
+								newX -= size * 2;
+
+							newY -= size;
 						}
+						else if (l.isHorizontal())
+						{
+							if (velY > 0)
+								newY -= size * 2;
+
+							newX -= size;
+						}
+						else
+						{
+							double s1 = l.slope(); 
+							double s2 = (new Line((l.x0 - t), l.y0, (float)(posX + size), (float)(posY + size), false)).slope();
+
+							double coefX = 1 - Math.min(1, s1); 
+							double coefY = 2;
+
+							if (s2 <= s1)
+							{
+								newX -= size * coefX;
+								newY -= size * coefY;
+							}
+						}
+
+						posX = newX;
+						posY = newY;
 					}
 
-					posX = newX;
-					posY = newY;
+					double l0 = Math.sqrt(Math.pow((l.x1 + t) - (l.x0 - t), 2) + Math.pow(l.y1 - l.y0, 2));
+
+					short signX = (short) Math.signum(l.y0 - l.y1);
+					if (signX == 0)
+						signX = 1;
+					double sY = -signX * ((l.y1 - l.y0) / l0);
+					double sX = signX * (((l.x1 + t) - (l.x0 - t)) / l0);
+
+
+					reflectionV(sY,sX);
 				}
-
-				double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
-
-				short signX = (short) Math.signum(l.y0 - l.y1);
-				if (signX == 0)
-					signX = 1;
-				double sY = -signX * ((l.y1 - l.y0) / l0);
-				double sX = signX * ((l.x1 - l.x0) / l0);
-
-
-				reflectionV(sY,sX);
 			}
 		}
 	}
