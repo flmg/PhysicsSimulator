@@ -58,8 +58,7 @@ public class Main extends BasicGame {
 					if (ip.isKeyDown(Input.KEY_LCONTROL))
 						particules.addLine(mouseX, mouseY);
 					else
-						particules
-								.addSphere(mouseX, mouseY, 1024, 500, texture);
+						particules.addSphere(mouseX, mouseY, 1024, 500, texture);
 				}
 			}
 			// right click (add particle)

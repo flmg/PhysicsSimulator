@@ -95,6 +95,7 @@ public class Sphere {
 		// We'd rather square the other side of the (in)equation
 		return (dX + dY <= Math.pow(range, 2));
 	}
+
 	private double dot(double uX, double uY, double vX, double vY)
 	{
 		return (uX * vX + uY * vY);
@@ -116,50 +117,53 @@ public class Sphere {
 
 		if (c1 >= 0 && c2 >= c1)
 		{
-			double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
-
-			short signX = (short) Math.signum(l.y0 - l.y1);
-			if (signX == 0)
-				signX = 1;
-			double sY = -signX * ((l.y1 - l.y0) / l0);
-			double sX = signX * ((l.x1 - l.x0) / l0);
-			
-			if (inRange(newX, newY, size + 1))
+			if (inRange(newX, newY, size))
 			{
-				if (inRange(newX, newY, size))
+				if (inRange(newX, newY, size - 1))
 				{
 					if (l.isVertical())
 					{
 						if (velX > 0)
-							posX = newX - size * 2;
-						else
-							posX = newX;
+							newX -= size * 2;
 
-						posY = newY - size;
+						newY -= size;
 					}
 					else if (l.isHorizontal())
 					{
 						if (velY > 0)
-							posY = newY - size * 2;
-						else
-							posY = newY;
+							newY -= size * 2;
 
-						posX = newX - size;
+						newX -= size;
 					}
 					else
 					{
-						double s = l.slope(); 
-						double coefX = 1 - Math.min(1, s); 
+						double s1 = l.slope(); 
+						double s2 = (new Line(l.x0, l.y0, (float)(posX + size), (float)(posY + size), false)).slope();
+
+						double coefX = 1 - Math.min(1, s1); 
 						double coefY = 2;
 
-						newX -= size * coefX;
-						newY -= size * coefY;
-
-						posX = newX; 
-						posY = newY;
+						if (s2 <= s1)
+						{
+							newX -= size * coefX;
+							newY -= size * coefY;
+						}
 					}
+
+					posX = newX;
+					posY = newY;
 				}
-				reflectionV(sY,sX);	
+
+				double l0 = Math.sqrt(Math.pow(l.x1 - l.x0, 2) + Math.pow(l.y1 - l.y0, 2));
+
+				short signX = (short) Math.signum(l.y0 - l.y1);
+				if (signX == 0)
+					signX = 1;
+				double sY = -signX * ((l.y1 - l.y0) / l0);
+				double sX = signX * ((l.x1 - l.x0) / l0);
+
+
+				reflectionV(sY,sX);
 			}
 		}
 	}
@@ -186,7 +190,7 @@ public class Sphere {
 		if (posY + size * 2 > HEIGHT)
 			posY = HEIGHT - 2 - size * 2;
 	}
-	
+
 	public void gravityChanger()
 	{
 		this.gravity = !this.gravity;
