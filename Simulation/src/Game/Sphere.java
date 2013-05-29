@@ -59,7 +59,7 @@ public class Sphere {
 			this.texture.draw((float)posX, (float)posY, (float)scale);
 	}
 	// Normal update
-	public void update(double dt, LinkedList<Line> lines) throws SlickException {
+	public void update(double dt, LinkedList<Line> lines, LinkedList<Rectangle> rects) throws SlickException {
 
 		// Gravity
 		if (gravity)
@@ -68,6 +68,9 @@ public class Sphere {
 		// Line collision
 		for (int i = 0; i < lines.size(); i++)
 			collisionL2S(lines.get(i));
+		// Rectangle collision
+		for (int i = 0; i < rects.size(); i++)
+			collisionR2S(rects.get(i));
 
 		checkBounds();
 
@@ -101,7 +104,7 @@ public class Sphere {
 	{
 		return (uX * vX + uY * vY);
 	}
-	private void collisionEndpoint(float x1, float y1)
+	private boolean collisionEndpoint(float x1, float y1)
 	{
 		// Calculation of the resulting impulse for each ball
 		final double endMass = mass;
@@ -113,12 +116,21 @@ public class Sphere {
 		double w_y = velY - p * mass * n_y - p * endMass * n_y;
 		velX = w_x;
 		velY = w_y;
+		return true;
 	}
-	private void collisionL2S(Line l) { 
+	private void collisionR2S(Rectangle r)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (collisionL2S(r.edges[i]))
+				break;
+		}
+	}
+	private boolean collisionL2S(Line l) { 
 		if (!l.isBound && inRange(l.x0, l.y0, size))
-			collisionEndpoint(l.x0, l.y0);
+			return collisionEndpoint(l.x0, l.y0);
 		else if (!l.isBound && inRange(l.x1, l.y1, size))
-			collisionEndpoint(l.x1, l.y1);
+			return collisionEndpoint(l.x1, l.y1);
 		else
 		{
 			int t = 0;
@@ -184,9 +196,11 @@ public class Sphere {
 
 
 					reflectionV(sY,sX);
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	// Calculates the reflection vector

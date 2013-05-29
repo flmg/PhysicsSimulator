@@ -64,6 +64,8 @@ public class Main extends BasicGame {
 				} else {
 					if (ip.isKeyDown(Input.KEY_LCONTROL))
 						particules.addLine(mouseX, mouseY);
+					else if (ip.isKeyDown(Input.KEY_LSHIFT))
+						particules.addSquare(mouseX, mouseY);
 					else
 						particules.addSphere(mouseX, mouseY, width, height, texture);
 				}

@@ -10,6 +10,7 @@ public class ParticulesHandler
 {	
 	private LinkedList<Sphere> spheres;
 	private LinkedList<Line> lines;
+	private LinkedList<Rectangle> rects;
 	private int selected;
 	private float tempX0;
 	private float tempY0;
@@ -20,6 +21,7 @@ public class ParticulesHandler
 	public ParticulesHandler(int w, int h) {
 		this.spheres = new LinkedList<Sphere>();
 		this.lines = new LinkedList<Line>();
+		this.rects = new LinkedList<Rectangle>();
 
 		this.w = w;
 		this.h = h;
@@ -57,6 +59,10 @@ public class ParticulesHandler
 			Line l = lines.get(i);
 			g.drawLine(l.x0, l.y0, l.x1, l.y1);
 		}
+		for (int i = 0; i < rects.size(); i++)
+		{
+			rects.get(i).render(g);
+		}
 		if (tempX0 != -1)
 			g.drawLine(tempX0, tempY0, x, y);
 	}
@@ -69,7 +75,7 @@ public class ParticulesHandler
 			if (spheres.get(i).selected)
 				spheres.get(i).update(x, y, dt);
 			else
-				spheres.get(i).update(dt, lines);
+				spheres.get(i).update(dt, lines, rects);
 		}
 	}
 	public void getBlocks(int cells[][])
@@ -244,6 +250,11 @@ public class ParticulesHandler
 		else
 			addLine(x,y);
 	}
+
+	public void addSquare(int x, int y)
+	{
+		rects.add(new Rectangle(x - 50, y - 50, x + 50, y - 50, x - 50, y + 50, x + 50, y + 50));
+	}
 	public void addLine(int x, int y)
 	{
 		// First step : start point
@@ -255,27 +266,30 @@ public class ParticulesHandler
 		// Second step : end point
 		else
 		{
-			//			float dx = x - tempX0; //delta x
-			//			float dy = y - tempY0; //delta y
-			//
-			//            double linelength = Math.sqrt(dx * dx + dy * dy);
-			//            dx /= linelength; 
-			//            dy /= linelength;
-			//            
-			//            //Ok, (dx, dy) is now a unit vector pointing in the direction of the line
-			//            int thickness = 25;
-			//            float px = thickness / 2 * -dy; //vector with length width/2
-			//            float py = thickness / 2 * dx;
-			//            
-			//            // top and bottom
-			//            this.lines.add(new Line(tempX0 + px-py, tempY0 + py+px,  x + px+py, y + py-px, false));
-			//            this.lines.add(new Line(x - px+py, y - (py+px),  tempX0 - (px+py), tempY0 - (py-px), false));
-			//            // sides
-			//            this.lines.add(new Line(x + px+py, y + py-px, x - px+py, y - (py+px), false));
-			//            this.lines.add(new Line(tempX0 + px-py, tempY0 + py+px,  tempX0 - (px+py), tempY0 - (py-px), false));
-			//
+			float dx = x - tempX0; //delta x
+			float dy = y - tempY0; //delta y
 
-			this.lines.add(new Line(tempX0, tempY0, x, y, false));
+			double linelength = Math.sqrt(dx * dx + dy * dy);
+			dx /= linelength; 
+			dy /= linelength;
+
+			//Ok, (dx, dy) is now a unit vector pointing in the direction of the line
+			int thickness = 25;
+			float px = thickness / 2 * -dy; //vector with length width/2
+			float py = thickness / 2 * dx;
+
+			// top and bottom
+			this.rects.add(
+					new Rectangle(
+							(int) (x + px+py), 
+							(int) (y + py-px),
+							(int) (tempX0 + px-py),
+							(int) (tempY0 + py+px),
+							(int) (x - px+py), 
+							(int) (y - (py+px)),  
+							(int) (tempX0 - (px+py)), 
+							(int) (tempY0 - (py-px))));
+
 			tempX0 = -1;
 			tempY0 = -1;
 		}
@@ -286,6 +300,7 @@ public class ParticulesHandler
 		tempY0 = -1;
 		this.spheres.clear();
 		this.lines.clear();
+		this.rects.clear();
 		genBoundaries();
 	}
 	// ==============================
